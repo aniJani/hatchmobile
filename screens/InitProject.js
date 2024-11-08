@@ -1,23 +1,24 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, ScrollView, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { createTaskDivision } from "../services/goalDivision"; // Correctly import the API function
 
 export default function InitProject() {
   const [projectDescription, setProjectDescription] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [expandedTaskIndex, setExpandedTaskIndex] = useState(null);
+  const [editingTaskIndex, setEditingTaskIndex] = useState(null);
+  const [editedTask, setEditedTask] = useState({ stepTitle: "", description: "", estimatedTime: "" });
 
   const handleGenerateTasks = async () => {
     if (!projectDescription.trim()) {
       alert("Please enter a project description.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const generatedTasks = await createTaskDivision(projectDescription);
-  
-      // Set tasks to the 'subtasks' array from the API response
       setTasks(generatedTasks.subtasks || []); // Use an empty array if 'subtasks' is undefined
     } catch (error) {
       console.error("Error generating tasks:", error);
@@ -26,7 +27,26 @@ export default function InitProject() {
       setLoading(false);
     }
   };
-  
+
+  const toggleDropdown = (index) => {
+    if (expandedTaskIndex === index) {
+      setExpandedTaskIndex(null); // Collapse if the same task is clicked
+    } else {
+      setExpandedTaskIndex(index); // Expand the clicked task
+    }
+  };
+
+  const startEditing = (index) => {
+    setEditingTaskIndex(index);
+    setEditedTask(tasks[index]);
+  };
+
+  const saveEditedTask = () => {
+    const updatedTasks = [...tasks];
+    updatedTasks[editingTaskIndex] = editedTask;
+    setTasks(updatedTasks);
+    setEditingTaskIndex(null); // Exit editing mode
+  };
 
   return (
     <View style={styles.container}>
@@ -46,9 +66,40 @@ export default function InitProject() {
         <ScrollView style={styles.taskList}>
           {tasks.map((task, index) => (
             <View key={index} style={styles.taskCard}>
-              <Text style={styles.taskTitle}>{`Step ${task.stepNumber}: ${task.stepTitle}`}</Text>
-              <Text style={styles.taskDescription}>{task.description}</Text>
-              <Text style={styles.taskTime}>{`Estimated Time: ${task.estimatedTime}`}</Text>
+              <TouchableOpacity onPress={() => toggleDropdown(index)}>
+                <Text style={styles.taskTitle}>{`${task.stepNumber}: ${task.stepTitle}`}</Text>
+              </TouchableOpacity>
+              {expandedTaskIndex === index && (
+                <View style={styles.taskDetails}>
+                  {editingTaskIndex === index ? (
+                    <>
+                      <TextInput
+                        style={styles.editInput}
+                        value={editedTask.stepTitle}
+                        onChangeText={(text) => setEditedTask({ ...editedTask, stepTitle: text })}
+                      />
+                      <TextInput
+                        style={styles.editInput}
+                        multiline
+                        value={editedTask.description}
+                        onChangeText={(text) => setEditedTask({ ...editedTask, description: text })}
+                      />
+                      <TextInput
+                        style={styles.editInput}
+                        value={editedTask.estimatedTime}
+                        onChangeText={(text) => setEditedTask({ ...editedTask, estimatedTime: text })}
+                      />
+                      <Button title="Save" onPress={saveEditedTask} />
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.taskDescription}>{task.description}</Text>
+                      <Text style={styles.taskTime}>{`Estimated Time: ${task.estimatedTime}`}</Text>
+                      <Button title="Edit" onPress={() => startEditing(index)} />
+                    </>
+                  )}
+                </View>
+              )}
             </View>
           ))}
         </ScrollView>
@@ -96,6 +147,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  taskDetails: {
+    marginTop: 10,
+  },
   taskDescription: {
     fontSize: 16,
     marginTop: 5,
@@ -104,5 +158,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
     color: "#666",
+  },
+  editInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 10,
   },
 });
