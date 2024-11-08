@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { useState } from "react";
+import { signInUser } from "../services/userServices";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function SignInScreen({ navigation }) {
@@ -8,20 +8,13 @@ export default function SignInScreen({ navigation }) {
 
   const handleSignIn = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/user/signin", {
-        email,
-        password,
-      });
+      const data = await signInUser(email, password); // Call the signInUser service
 
-      if (response.status === 200) {
-        Alert.alert("Success", "Sign in successful!");
-        navigation.navigate("Dashboard"); // Navigate to Dashboard on successful sign-in
-      } else {
-        Alert.alert("Error", "Invalid credentials");
-      }
+      Alert.alert("Success", "Sign in successful!");
+      navigation.navigate("Dashboard"); // Navigate to Dashboard on successful sign-in
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Something went wrong during sign-in.");
+      Alert.alert("Error", error.message || "Something went wrong during sign-in.");
     }
   };
 

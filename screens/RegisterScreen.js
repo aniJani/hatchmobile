@@ -14,9 +14,7 @@ import {
   View,
 } from 'react-native';
 import { useAuth } from '../contexts/auth'; // Adjust the path if necessary
-import { auth } from '../firebase'; // Import auth from firebase.js
-
-const API_URL = 'http://10.0.0.184:3000/user/register'; // Replace with your backend URL
+import { registerUser } from '../services/userServices';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -52,47 +50,23 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      // Register with Firebase
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      // Update the user profile with display name
-      await updateProfile(user, { displayName: name });
-
-      // Prepare data for MongoDB
-      const userData = {
-        email,
+      // Call the registerUser service
+      const { user } = await registerUser({
         name,
+        email,
+        password,
         description,
-        skills: skills.split(',').map((skill) => skill.trim()), // Convert comma-separated skills to array
+        skills,
         openToCollaboration,
-      };
-
-      // Send data to backend
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
       });
 
-      if (response.ok) {
-        Alert.alert('Success', 'Account created successfully!');
-        setAuthData({
-          token: user.uid,
-          email: user.email,
-          name: user.displayName,
-        });
-        navigation.navigate('Dashboard'); // Replace with your desired screen
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Failed to register user in database.');
-      }
+      Alert.alert('Success', 'Account created successfully!');
+      setAuthData({
+        token: user.uid,
+        email: user.email,
+        name: user.displayName,
+      });
+      navigation.navigate('Dashboard'); // Replace with your desired screen
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/email-already-in-use') {
@@ -102,7 +76,7 @@ const RegisterScreen = ({ navigation }) => {
       } else if (error.code === 'auth/weak-password') {
         setError('Password is too weak.');
       } else {
-        setError('Failed to sign up. Please try again.');
+        setError(error.message || 'Failed to sign up. Please try again.');
       }
     }
   };
