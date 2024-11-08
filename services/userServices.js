@@ -60,3 +60,29 @@ export const signInUser = async (email, password) => {
     }
   }
   };
+
+  export const getUserByEmail = async (email) => {
+    try {
+      // Validate that the email is provided
+      if (!email) {
+        throw new Error('Email is required');
+      }
+  
+      // Make a GET request to the backend endpoint to fetch the user by email
+      const response = await axios.get(`http://${process.env.BASE_URL}/user/getUserByEmail`, {
+        params: { email },
+      });
+  
+      // Return the user data from the response
+      return response.data;
+    } catch (error) {
+      // Handle errors and rethrow them with a descriptive message
+      if (error.response && error.response.status === 404) {
+        throw new Error('User not found');
+      } else if (error.response) {
+        throw new Error(error.response.data.message || 'Failed to fetch user data');
+      } else {
+        throw new Error('Network error. Please try again later.');
+      }
+    }
+  };

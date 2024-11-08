@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet, Button } from "react-native";
-import axios from "axios";
 import { loadProjects, loadTasks } from "../services/projectServices";
+import { useAuth } from "../contexts/auth";
+import { getUserByEmail } from "../services/userServices";
 
 export default function DashboardScreen({ navigation }) {
+  const { authData, loading } = useAuth(); // Access authData from the auth context
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [userData, setUserData] = useState(null);
 
-  // Load data when the screen loads
   useEffect(() => {
-    fetchProjects();
-    fetchTasks();
-  }, []);
+    if (!loading && authData) {
+      fetchUserData();
+      fetchProjects();
+      fetchTasks();
+    }
+  }, [loading, authData]);
 
-  // Fetch projects using the service function
+  const fetchUserData = async () => {
+    try {
+      const data = await getUserByEmail(authData.email);
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   const fetchProjects = async () => {
     try {
       const projectData = await loadProjects();
@@ -23,7 +36,6 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  // Fetch tasks using the service function
   const fetchTasks = async () => {
     try {
       const taskData = await loadTasks();
@@ -39,9 +51,7 @@ export default function DashboardScreen({ navigation }) {
       <Text>{item.description}</Text>
       <Button
         title="View Project"
-        onPress={() =>
-          navigation.navigate("ProjectDetail", { projectId: item._id })
-        }
+        onPress={() => navigation.navigate("ProjectDetail", { projectId: item._id })}
       />
     </View>
   );
@@ -57,6 +67,10 @@ export default function DashboardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
+
+      {!loading && authData && (
+        <Text style={styles.email}>Welcome, {userData.name}!</Text>
+      )}
 
       <Text style={styles.sectionTitle}>Current Projects</Text>
       <FlatList
@@ -74,7 +88,6 @@ export default function DashboardScreen({ navigation }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -86,6 +99,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
+  },
+  email: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 20,

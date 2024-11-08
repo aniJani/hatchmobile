@@ -12,6 +12,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import SignInScreen from './screens/SignInScreen';
 import SettingsScreen from './screens/SettingsScreen'; // Example screen
 import UserProfileScreen from './screens/UserProfileScreen';
+import InitProject from './screens/InitProject';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,6 +37,16 @@ const AppTabs = () => (
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
     <Tab.Screen name="Profile" component={UserProfileScreen} />
     <Tab.Screen name="Settings" component={SettingsScreen} />
+    <Tab.Screen
+      name="InitProject"
+      component={InitProject}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="add-circle-outline" color={color} size={size} />
+        ),
+        tabBarLabel: "New Project", // Label for the Plus button
+      }}
+    />
   </Tab.Navigator>
 );
 
