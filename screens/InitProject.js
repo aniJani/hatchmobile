@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from "react-native";
-import { generateTasks } from "../services/apiService";
+import { generateTasks as createTaskDivision } from "../services/goalDivision";
 
 export default function InitProject() {
   const [projectDescription, setProjectDescription] = useState("");
@@ -15,7 +15,7 @@ export default function InitProject() {
 
     setLoading(true);
     try {
-      const generatedTasks = await generateTasks(projectDescription);
+      const generatedTasks = await createTaskDivision(projectDescription);
       setTasks(generatedTasks);
     } catch (error) {
       console.error("Error generating tasks:", error);

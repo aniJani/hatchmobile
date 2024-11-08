@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Button } from "react-native";
+import { View, Text, FlatList, StyleSheet, Button, ActivityIndicator } from "react-native";
 import { loadProjects, loadTasks } from "../services/projectServices";
 import { useAuth } from "../contexts/auth";
 import { getUserByEmail } from "../services/userServices";
@@ -68,26 +68,39 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
 
-      {!loading && authData && (
+      {loading && <ActivityIndicator size="large" color="#0000ff" />}
+      
+      {!loading && authData && userData ? (
         <Text style={styles.email}>Welcome, {userData.name}!</Text>
+      ) : (
+        !loading && <Text style={styles.email}>Loading user data...</Text>
       )}
 
       <Text style={styles.sectionTitle}>Current Projects</Text>
-      <FlatList
-        data={projects}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={renderProject}
-      />
+      {projects.length === 0 ? (
+        <Text>No projects available.</Text>
+      ) : (
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={renderProject}
+        />
+      )}
 
       <Text style={styles.sectionTitle}>Upcoming Tasks</Text>
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={renderTask}
-      />
+      {tasks.length === 0 ? (
+        <Text>No upcoming tasks.</Text>
+      ) : (
+        <FlatList
+          data={tasks}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={renderTask}
+        />
+      )}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

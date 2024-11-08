@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { signInUser } from "../services/userServices";
 import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { auth } from "../firebase"; // Import your Firebase auth configuration
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -15,6 +17,21 @@ export default function SignInScreen({ navigation }) {
     } catch (error) {
       console.error(error);
       Alert.alert("Error", error.message || "Something went wrong during sign-in.");
+    }
+  };
+  
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email address first.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email); // Firebase method to send a password reset email
+      Alert.alert("Success", "Password reset email sent! Please check your inbox.");
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", error.message || "Failed to send password reset email.");
     }
   };
 
@@ -38,6 +55,8 @@ export default function SignInScreen({ navigation }) {
       />
 
       <Button title="Sign In" onPress={handleSignIn} />
+
+      <Button title="Forgot Password?" onPress={handleForgotPassword} />
     </View>
   );
 }
