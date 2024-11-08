@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet, Button } from "react-native";
 import axios from "axios";
+import { loadProjects, loadTasks } from "../services/projectServices";
 
 export default function DashboardScreen({ navigation }) {
   const [projects, setProjects] = useState([]);
@@ -8,25 +9,27 @@ export default function DashboardScreen({ navigation }) {
 
   // Load data when the screen loads
   useEffect(() => {
-    loadProjects();
-    loadTasks();
+    fetchProjects();
+    fetchTasks();
   }, []);
 
-  const loadProjects = async () => {
+  // Fetch projects using the service function
+  const fetchProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/project/list");
-      setProjects(response.data);
+      const projectData = await loadProjects();
+      setProjects(projectData);
     } catch (error) {
-      console.error("Error loading projects:", error);
+      console.error("Error fetching projects:", error);
     }
   };
 
-  const loadTasks = async () => {
+  // Fetch tasks using the service function
+  const fetchTasks = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/task/list");
-      setTasks(response.data);
+      const taskData = await loadTasks();
+      setTasks(taskData);
     } catch (error) {
-      console.error("Error loading tasks:", error);
+      console.error("Error fetching tasks:", error);
     }
   };
 
