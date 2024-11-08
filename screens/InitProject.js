@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
-import { createTaskDivision } from "../services/goalDivision"; // Correctly import the API function
+import { createTaskDivision, saveTasksToDatabase } from "../services/goalDivision"; // Correctly import the API function
 
-export default function InitProject() {
+
+export default function InitProject({ navigation }) {
   const [projectDescription, setProjectDescription] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,9 +49,21 @@ export default function InitProject() {
     setEditingTaskIndex(null); // Exit editing mode
   };
 
+  const handleSaveTasks = async () => {
+    try {
+      await saveTasksToDatabase(tasks); // Save tasks to the database
+      navigation.navigate('Dashboard')
+      alert("Tasks saved successfully!");
+    } catch (error) {
+      console.error("Error saving tasks:", error);
+      alert("Failed to save tasks. Please try again.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Project Task Generator</Text>
+      <Button title="Done" onPress={handleSaveTasks} style={styles.doneButton} />
       <TextInput
         style={styles.input}
         multiline
@@ -104,6 +117,7 @@ export default function InitProject() {
           ))}
         </ScrollView>
       )}
+      
     </View>
   );
 }
@@ -165,5 +179,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     marginBottom: 10,
+  },
+  doneButton: {
+    marginTop: 20,
   },
 });

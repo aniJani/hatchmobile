@@ -9,7 +9,7 @@ import axios from 'axios';
  */
 export const createTaskDivision = async (taskDescription) => {
     try {
-        const response = await axios.post(`http://10.0.0.16:3000/openai/TaskGen`, {
+        const response = await axios.post(`http://${process.env.BASE_URL}/openai/TaskGen`, {
             task: taskDescription,
         });
         return response.data; // Returns the data from the API response
@@ -17,4 +17,20 @@ export const createTaskDivision = async (taskDescription) => {
         console.error('Error creating task division:', error);
         throw error;
     }
+};
+
+export const saveTasksToDatabase = async (tasks) => {
+  try {
+    // Simulate a delay to mimic an API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Log the tasks to the console to simulate saving
+    console.log("Tasks saved successfully:", tasks);
+
+    // Return a success message
+    return { message: "Tasks saved successfully (dummy response)" };
+  } catch (error) {
+    console.error("Error saving tasks to the database:", error);
+    throw error; // Re-throw the error for the caller to handle
+  }
 };
