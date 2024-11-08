@@ -1,4 +1,4 @@
-import { BASE_URL } from '@env';
+
 import axios from 'axios';
 
 /**
@@ -9,7 +9,7 @@ import axios from 'axios';
  */
 export const createTaskDivision = async (taskDescription) => {
     try {
-        const response = await axios.post(`${BASE_URL}/openai/TaskGen`, {
+        const response = await axios.post(`http://10.0.0.16:3000/openai/TaskGen`, {
             task: taskDescription,
         });
         return response.data; // Returns the data from the API response

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from "react-native";
-import { generateTasks as createTaskDivision } from "../services/goalDivision";
+import { createTaskDivision } from "../services/goalDivision"; // Correctly import the API function
 
 export default function InitProject() {
   const [projectDescription, setProjectDescription] = useState("");
@@ -12,11 +12,13 @@ export default function InitProject() {
       alert("Please enter a project description.");
       return;
     }
-
+  
     setLoading(true);
     try {
       const generatedTasks = await createTaskDivision(projectDescription);
-      setTasks(generatedTasks);
+  
+      // Set tasks to the 'subtasks' array from the API response
+      setTasks(generatedTasks.subtasks || []); // Use an empty array if 'subtasks' is undefined
     } catch (error) {
       console.error("Error generating tasks:", error);
       alert("Failed to generate tasks. Please try again.");
@@ -24,6 +26,7 @@ export default function InitProject() {
       setLoading(false);
     }
   };
+  
 
   return (
     <View style={styles.container}>
