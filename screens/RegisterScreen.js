@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../contexts/auth'; // Adjust the path if necessary
 import { auth } from '../firebase'; // Import auth from firebase.js
 
-const API_URL = 'http://10.16.28.214:3000/user/register'; // Replace with your backend URL
+const API_URL = 'http://10.0.0.184:3000/user/register'; // Replace with your backend URL
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
