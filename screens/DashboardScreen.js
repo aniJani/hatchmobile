@@ -48,6 +48,11 @@ export default function DashboardScreen({ navigation }) {
     setSuggestedCollaborators(collaborators);
   };
 
+  const handleSearchCollaborators = () => {
+    // Implement your search logic here
+    console.log("Search button clicked!");
+  };
+
   const renderProject = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{item.title}</Text>
@@ -89,7 +94,11 @@ export default function DashboardScreen({ navigation }) {
         />
       )}
 
-      <Text style={styles.sectionTitle}>Suggested Collaborators</Text>
+      <View style={styles.collaboratorsHeader}>
+        <Text style={styles.sectionTitle}>Suggested Collaborators</Text>
+        <Button title="Search" onPress={handleSearchCollaborators} />
+      </View>
+
       {suggestedCollaborators.length === 0 ? (
         <Text>No collaborators suggested.</Text>
       ) : (
@@ -124,6 +133,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 20,
+    marginBottom: 10,
+  },
+  collaboratorsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
     marginBottom: 10,
   },
   card: {
