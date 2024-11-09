@@ -6,7 +6,7 @@ import axios from 'axios';
 export const loadProjects = async (email) => {
   try {
     // Construct the base URL using an environment variable and template literals
-    const response = await axios.get(`http://${process.env.BASE_URL}/projects/list`, {
+    const response = await axios.get(`http://10.16.17.44:3000/projects/list`, {
       params: { email }, // Pass the email as a query parameter
       headers: {
         'Content-Type': 'application/json',
