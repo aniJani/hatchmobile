@@ -9,6 +9,7 @@ export default function UserProfileScreen() {
   const [description, setDescription] = useState("");
   const [openToCollaboration, setOpenToCollaboration] = useState(false);
   const [userLoading, setUserLoading] = useState(true);
+  const [userLoading, setUserLoading] = useState(true);
 
   const loadUserProfile = async () => {
     try {
