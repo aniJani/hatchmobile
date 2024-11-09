@@ -13,6 +13,8 @@ import RegisterScreen from './screens/RegisterScreen';
 import SettingsScreen from './screens/SettingsScreen'; // Example screen
 import SignInScreen from './screens/SigninScreen';
 import UserProfileScreen from './screens/UserProfileScreen';
+import ProjectDetailScreen from './screens/ProjectDetail'; // Import ProjectDetailScreen
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -65,6 +67,11 @@ const AppStack = () => (
     screenOptions={{ headerShown: false }} // Hide header for all AppStack screens
   >
     <Stack.Screen name="AppTabs" component={AppTabs} />
+    <Stack.Screen
+      name="ProjectDetail"
+      component={ProjectDetailScreen}
+      options={{ headerShown: true, title: "Project Details" }}
+    />
     {/* Add more stack screens if needed */}
   </Stack.Navigator>
 );
