@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Button, ActivityIndicator} from "react-native";
-import { loadProjects, loadTasks } from "../services/projectServices";
+import { View, Text, FlatList, StyleSheet, Button, ActivityIndicator } from "react-native";
+import { loadProjects } from "../services/projectServices";
 import { useAuth } from "../contexts/auth";
 import { getUserByEmail } from "../services/userServices";
 
 export default function DashboardScreen({ navigation }) {
   const { authData, loading } = useAuth(); // Access authData from the auth context
   const [projects, setProjects] = useState([]);
-  const [tasks, setTasks] = useState([]);
   const [userData, setUserData] = useState(null);
+  const [suggestedCollaborators, setSuggestedCollaborators] = useState([]);
 
   useEffect(() => {
     if (!loading && authData) {
       fetchUserData();
       fetchProjects();
-      fetchTasks();
+      suggestCollaborators();
     }
   }, [loading, authData]);
 
@@ -36,13 +36,16 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  const fetchTasks = async () => {
-    try {
-      const taskData = await loadTasks();
-      setTasks(taskData);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    }
+  // Function to suggest collaborators (placeholder logic)
+  const suggestCollaborators = () => {
+    // Placeholder logic for suggesting collaborators
+    // You may replace this with real logic based on your use case
+    const collaborators = [
+      { id: 1, name: "Alice Johnson", email: "alice@example.com" },
+      { id: 2, name: "Bob Smith", email: "bob@example.com" },
+      { id: 3, name: "Charlie Davis", email: "charlie@example.com" },
+    ];
+    setSuggestedCollaborators(collaborators);
   };
 
   const renderProject = ({ item }) => (
@@ -53,15 +56,13 @@ export default function DashboardScreen({ navigation }) {
         title="View Project"
         onPress={() => navigation.navigate("ProjectDetail", { projectId: item._id })}
       />
-
     </View>
   );
 
-  const renderTask = ({ item }) => (
+  const renderCollaborator = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.taskName}</Text>
-      <Text>Assigned to: {item.assignedTo}</Text>
-      <Text>Due: {item.dueDate}</Text>
+      <Text style={styles.cardTitle}>{item.name}</Text>
+      <Text>Email: {item.email}</Text>
     </View>
   );
 
@@ -70,7 +71,7 @@ export default function DashboardScreen({ navigation }) {
       <Text style={styles.title}>Dashboard</Text>
 
       {loading && <ActivityIndicator size="large" color="#0000ff" />}
-      
+
       {!loading && authData && userData ? (
         <Text style={styles.email}>Welcome, {userData.name}!</Text>
       ) : (
@@ -88,14 +89,14 @@ export default function DashboardScreen({ navigation }) {
         />
       )}
 
-      <Text style={styles.sectionTitle}>Upcoming Tasks</Text>
-      {tasks.length === 0 ? (
-        <Text>No upcoming tasks.</Text>
+      <Text style={styles.sectionTitle}>Suggested Collaborators</Text>
+      {suggestedCollaborators.length === 0 ? (
+        <Text>No collaborators suggested.</Text>
       ) : (
         <FlatList
-          data={tasks}
-          keyExtractor={(item) => item._id.toString()}
-          renderItem={renderTask}
+          data={suggestedCollaborators}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderCollaborator}
         />
       )}
     </View>
