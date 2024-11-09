@@ -29,7 +29,7 @@ export default function DashboardScreen({ navigation }) {
 
   const fetchProjects = async () => {
     try {
-      const projectData = await loadProjects();
+      const projectData = await loadProjects(authData.email); // Pass user email to loadProjects
       setProjects(projectData);
     } catch (error) {
       console.error("Error fetching projects:", error);

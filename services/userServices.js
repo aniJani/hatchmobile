@@ -86,3 +86,53 @@ export const signInUser = async (email, password) => {
       }
     }
   };
+
+/**
+ * Function to update user profile
+ * @param {Object} userData - The user data to update, including email, description, skills, and openToCollaboration
+ * @returns {Promise<Object>} - The response data from the server
+ * @throws {Error} - Throws an error if the request fails
+ */
+export const updateUserProfile = async ({ email, description, skills, openToCollaboration }) => {
+  try {
+    // Validate and format the skills input
+    const skillsArray = Array.isArray(skills)
+      ? skills
+      : (skills || '').split(',').map(skill => skill.trim());
+
+    // Prepare the data for the request
+    const updatedData = {
+      email,
+      description,
+      skills: skillsArray,
+      openToCollaboration,
+    };
+
+    // Log the data being sent to the server
+    console.log('Sending update data:', updatedData);
+
+    // Make a PUT request to the backend
+    const response = await axios.put('http://10.16.17.44:3000/user/update', updatedData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Check the response status
+    if (response.status !== 200) {
+      throw new Error(response.data.error || 'Failed to update user profile.');
+    }
+
+    // Return the response data
+    return response.data;
+  } catch (error) {
+    // Log the error details for debugging
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+      throw new Error(error.response.data.error || 'Error updating profile');
+    } else {
+      console.error('Error in updateUserProfile:', error.message);
+      throw new Error('Error updating profile');
+    }
+  }
+};
