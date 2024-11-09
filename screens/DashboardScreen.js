@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Button, FlatList, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import SearchModal from "../components/searchModal"; // Import the SearchModal component
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 import { loadProjects } from "../services/projectServices";
 import { getUserByEmail } from "../services/userServices";
 
-export default function DashboardScreen({ navigation }) { // Pass navigation as a prop
+export default function DashboardScreen({ navigation }) {
   const { authData, loading } = useAuth();
   const [projects, setProjects] = useState([]);
   const [userData, setUserData] = useState(null);
   const [suggestedCollaborators, setSuggestedCollaborators] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -56,11 +56,11 @@ export default function DashboardScreen({ navigation }) { // Pass navigation as 
     }
   };
 
-  const handleSearch = async () => {
-    if (searchQuery.trim() === "") return;
+  const handleSearch = async (query) => {
+    if (query.trim() === "") return;
     setIsSearching(true);
     try {
-      const results = await findUserMatch(searchQuery, userData._id);
+      const results = await findUserMatch(query, userData._id);
       setSearchResults(results);
     } catch (error) {
       console.error("Error searching collaborators:", error);
@@ -127,38 +127,14 @@ export default function DashboardScreen({ navigation }) { // Pass navigation as 
         />
       )}
 
-      {/* Modal for Matchmaking Search */}
-      <Modal
-        animationType="slide"
-        transparent={true}
+      {/* Use SearchModal Component */}
+      <SearchModal
         visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Search Collaborators</Text>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Enter keyword..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            <Button title="Search" onPress={handleSearch} />
-
-            {isSearching ? (
-              <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
-            ) : (
-              <FlatList
-                data={searchResults}
-                keyExtractor={(item) => item._id.toString()}
-                renderItem={renderCollaborator}
-                ListEmptyComponent={<Text>No results found.</Text>}
-              />
-            )}
-            <Button title="Close" onPress={() => setIsModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setIsModalVisible(false)}
+        onSearch={handleSearch}
+        searchResults={searchResults}
+        isSearching={isSearching}
+      />
     </View>
   );
 }
@@ -202,30 +178,5 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: "bold",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: "90%",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
   },
 });
