@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
-import { createTaskDivision, saveTasksToDatabase } from "../services/goalDivision"; // Correctly import the API function
-
+import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useAuth } from "../contexts/auth";
+import { createTaskDivision, saveProjectToDatabase } from "../services/goalDivision";
 
 export default function InitProject({ navigation }) {
+  const { authData } = useAuth();
+  const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ export default function InitProject({ navigation }) {
     setLoading(true);
     try {
       const generatedTasks = await createTaskDivision(projectDescription);
-      setTasks(generatedTasks.subtasks || []); // Use an empty array if 'subtasks' is undefined
+      setTasks(generatedTasks.subtasks || []);
     } catch (error) {
       console.error("Error generating tasks:", error);
       alert("Failed to generate tasks. Please try again.");
@@ -30,11 +32,7 @@ export default function InitProject({ navigation }) {
   };
 
   const toggleDropdown = (index) => {
-    if (expandedTaskIndex === index) {
-      setExpandedTaskIndex(null); // Collapse if the same task is clicked
-    } else {
-      setExpandedTaskIndex(index); // Expand the clicked task
-    }
+    setExpandedTaskIndex(expandedTaskIndex === index ? null : index);
   };
 
   const startEditing = (index) => {
@@ -46,24 +44,40 @@ export default function InitProject({ navigation }) {
     const updatedTasks = [...tasks];
     updatedTasks[editingTaskIndex] = editedTask;
     setTasks(updatedTasks);
-    setEditingTaskIndex(null); // Exit editing mode
+    setEditingTaskIndex(null);
   };
 
   const handleSaveTasks = async () => {
+    if (!projectName.trim()) {
+      alert("Please enter a project name.");
+      return;
+    }
+
     try {
-      await saveTasksToDatabase(tasks); // Save tasks to the database
-      navigation.navigate('Dashboard')
-      alert("Tasks saved successfully!");
+      await saveProjectToDatabase(
+        projectName,
+        projectDescription,
+        authData?.email,
+        tasks
+      );
+      alert("Project and tasks saved successfully!");
+      navigation.navigate("Dashboard");
     } catch (error) {
-      console.error("Error saving tasks:", error);
-      alert("Failed to save tasks. Please try again.");
+      console.error("Error saving project and tasks:", error);
+      alert("Failed to save project. Please try again.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Project Task Generator</Text>
       <Button title="Done" onPress={handleSaveTasks} style={styles.doneButton} />
+      <Text style={styles.title}>Project Task Generator</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter project name..."
+        value={projectName}
+        onChangeText={(text) => setProjectName(text)}
+      />
       <TextInput
         style={styles.input}
         multiline
@@ -80,7 +94,7 @@ export default function InitProject({ navigation }) {
           {tasks.map((task, index) => (
             <View key={index} style={styles.taskCard}>
               <TouchableOpacity onPress={() => toggleDropdown(index)}>
-                <Text style={styles.taskTitle}>{`${task.stepNumber}: ${task.stepTitle}`}</Text>
+                <Text style={styles.taskTitle}>{`${task.stepNumber || index + 1}: ${task.stepTitle}`}</Text>
               </TouchableOpacity>
               {expandedTaskIndex === index && (
                 <View style={styles.taskDetails}>
@@ -88,17 +102,20 @@ export default function InitProject({ navigation }) {
                     <>
                       <TextInput
                         style={styles.editInput}
+                        placeholder="Task Title"
                         value={editedTask.stepTitle}
                         onChangeText={(text) => setEditedTask({ ...editedTask, stepTitle: text })}
                       />
                       <TextInput
                         style={styles.editInput}
+                        placeholder="Task Description"
                         multiline
                         value={editedTask.description}
                         onChangeText={(text) => setEditedTask({ ...editedTask, description: text })}
                       />
                       <TextInput
                         style={styles.editInput}
+                        placeholder="Estimated Time"
                         value={editedTask.estimatedTime}
                         onChangeText={(text) => setEditedTask({ ...editedTask, estimatedTime: text })}
                       />
@@ -117,7 +134,6 @@ export default function InitProject({ navigation }) {
           ))}
         </ScrollView>
       )}
-      
     </View>
   );
 }
@@ -140,7 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 20,
-    height: 100,
     textAlignVertical: "top",
   },
   loadingText: {

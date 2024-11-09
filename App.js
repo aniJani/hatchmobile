@@ -1,6 +1,6 @@
 // App.js
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
@@ -8,31 +8,31 @@ import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from './contexts/auth'; // Adjust the path if necessary
 
 import DashboardScreen from './screens/DashboardScreen';
-import RegisterScreen from './screens/RegisterScreen';
-import SignInScreen from './screens/SignInScreen';
-import SettingsScreen from './screens/SettingsScreen'; // Example screen
-import UserProfileScreen from './screens/UserProfileScreen';
 import InitProject from './screens/InitProject';
+import RegisterScreen from './screens/RegisterScreen';
+import SettingsScreen from './screens/SettingsScreen'; // Example screen
+import SignInScreen from './screens/SigninScreen';
+import UserProfileScreen from './screens/UserProfileScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppTabs = () => (
   <Tab.Navigator
-  screenOptions={{
-    tabBarStyle: {
-      position: 'absolute', // Makes the tab bar absolutely positioned
-      bottom: 10, // Distance from the bottom of the screen
-      left: 10, // Distance from the left side of the screen
-      right: 10, // Distance from the right side of the screen
-      backgroundColor: '#000000', // Background color of the tab bar
-      borderRadius: 15, // Rounded corners for a modern look
-      height: 60, // Height of the tab bar
-    },
-    tabBarActiveTintColor: '#0000ff', // Color for active tab
-    tabBarInactiveTintColor: 'gray',
-    headerShown: false // Color for inactive tab
-  }}
+    screenOptions={{
+      tabBarStyle: {
+        position: 'absolute', // Makes the tab bar absolutely positioned
+        bottom: 10, // Distance from the bottom of the screen
+        left: 10, // Distance from the left side of the screen
+        right: 10, // Distance from the right side of the screen
+        backgroundColor: '#000000', // Background color of the tab bar
+        borderRadius: 15, // Rounded corners for a modern look
+        height: 60, // Height of the tab bar
+      },
+      tabBarActiveTintColor: '#0000ff', // Color for active tab
+      tabBarInactiveTintColor: 'gray',
+      headerShown: false // Color for inactive tab
+    }}
   >
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
     <Tab.Screen name="Profile" component={UserProfileScreen} />
@@ -60,7 +60,7 @@ const AuthStack = () => (
 
 // AppStack: Main app screens for authenticated users
 const AppStack = () => (
-<Stack.Navigator
+  <Stack.Navigator
     initialRouteName="AppTabs"
     screenOptions={{ headerShown: false }} // Hide header for all AppStack screens
   >
