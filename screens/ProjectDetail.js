@@ -1,3 +1,4 @@
+import { Picker } from "@react-native-picker/picker"; // Import Picker component for dropdown
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { editProjectById, getProjectById } from "../services/projectServices";
@@ -6,8 +7,8 @@ export default function ProjectDetailScreen({ route, navigation }) {
   const { projectId } = route.params;
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false); // To toggle between view and edit mode
-  const [updatedProject, setUpdatedProject] = useState({}); // To store edited project data
+  const [editMode, setEditMode] = useState(false);
+  const [updatedProject, setUpdatedProject] = useState({});
 
   useEffect(() => {
     fetchProjectDetails();
@@ -30,8 +31,8 @@ export default function ProjectDetailScreen({ route, navigation }) {
     try {
       await editProjectById(projectId, updatedProject);
       Alert.alert("Success", "Project updated successfully");
-      setEditMode(false); // Exit edit mode after saving
-      fetchProjectDetails(); // Refresh project details after update
+      setEditMode(false);
+      fetchProjectDetails();
     } catch (error) {
       console.error("Error updating project:", error);
       Alert.alert("Error", "Failed to update project. Please try again.");
@@ -39,7 +40,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
   };
 
   const handleInputChange = (field, value) => {
-    setUpdatedProject(prevState => ({
+    setUpdatedProject((prevState) => ({
       ...prevState,
       [field]: value,
     }));
@@ -120,16 +121,23 @@ export default function ProjectDetailScreen({ route, navigation }) {
                     setUpdatedProject({ ...updatedProject, goals: newGoals });
                   }}
                 />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Assigned To"
-                  value={goal.assignedTo}
-                  onChangeText={(text) => {
+
+                {/* Picker for selecting the assigned collaborator */}
+                <Picker
+                  selectedValue={goal.assignedTo}
+                  style={styles.picker}
+                  onValueChange={(itemValue) => {
                     const newGoals = [...updatedProject.goals];
-                    newGoals[index].assignedTo = text;
+                    newGoals[index].assignedTo = itemValue;
                     setUpdatedProject({ ...updatedProject, goals: newGoals });
                   }}
-                />
+                >
+                  <Picker.Item label="Select Collaborator" value="" />
+                  {project.collaborators.map((collaborator, idx) => (
+                    <Picker.Item key={idx} label={collaborator.email} value={collaborator.email} />
+                  ))}
+                </Picker>
+
                 <TextInput
                   style={styles.input}
                   placeholder="Estimated Time"
@@ -218,6 +226,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     borderRadius: 5,
+  },
+  picker: {
+    height: 50,
+    width: "100%",
+    marginVertical: 5,
   },
   buttonContainer: {
     marginTop: 20,
