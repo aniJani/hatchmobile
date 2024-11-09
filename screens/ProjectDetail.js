@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, FlatList } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons for the search icon
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Button, FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { editProjectById, getProjectById, searchExternalCollaborators } from "../services/projectServices";
 
 export default function ProjectDetailScreen({ route, navigation }) {
@@ -43,8 +43,8 @@ export default function ProjectDetailScreen({ route, navigation }) {
     // Add your explore functionality for the project here
     Alert.alert("Explore Project", "This feature will explore the project details further.");
   };
-  
-  
+
+
   const handleSaveGoalChanges = async (index) => {
     try {
       await editProjectById(projectId, updatedProject);
@@ -114,11 +114,11 @@ export default function ProjectDetailScreen({ route, navigation }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.projectTitleContainer}>
-          <Text style={styles.title}>{project.projectName}</Text>
-          <TouchableOpacity onPress={triggerProjectExplore} style={styles.exploreIcon}>
-            <MaterialIcons name="explore" size={30} color="#2196F3" />
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.title}>{project.projectName}</Text>
+        <TouchableOpacity onPress={triggerProjectExplore} style={styles.exploreIcon}>
+          <MaterialIcons name="explore" size={30} color="#2196F3" />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.description}>{project.description}</Text>
 
       <Text style={styles.sectionTitle}>Collaborators:</Text>
@@ -217,7 +217,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
                 </TouchableOpacity>
               )}
             />
-            
+
             <FlatList
               data={externalCollaborators}
               keyExtractor={(item) => item.email}

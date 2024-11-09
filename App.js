@@ -9,11 +9,12 @@ import { AuthProvider, useAuth } from './contexts/auth'; // Adjust the path if n
 
 import DashboardScreen from './screens/DashboardScreen';
 import InitProject from './screens/InitProject';
+import MatchmakingScreen from './screens/MatchmakingScreen';
+import ProjectDetailScreen from './screens/ProjectDetail'; // Import ProjectDetailScreen
 import RegisterScreen from './screens/RegisterScreen';
 import SettingsScreen from './screens/SettingsScreen'; // Example screen
 import SignInScreen from './screens/SigninScreen';
 import UserProfileScreen from './screens/UserProfileScreen';
-import ProjectDetailScreen from './screens/ProjectDetail'; // Import ProjectDetailScreen
 
 
 const Stack = createStackNavigator();
@@ -71,6 +72,11 @@ const AppStack = () => (
       name="ProjectDetail"
       component={ProjectDetailScreen}
       options={{ headerShown: true, title: "Project Details" }}
+    />
+    <Stack.Screen
+      name="MatchmakingScreen"
+      component={MatchmakingScreen}
+      options={{ headerShown: true, title: "Matchmaking Screen" }}
     />
     {/* Add more stack screens if needed */}
   </Stack.Navigator>

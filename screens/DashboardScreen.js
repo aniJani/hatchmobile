@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Button, FlatList, Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 import { loadProjects } from "../services/projectServices";
 import { getUserByEmail } from "../services/userServices";
 
-export default function DashboardScreen({ navigation }) {
-  const { authData, loading } = useAuth(); // Access authData from the auth context
+export default function DashboardScreen({ navigation }) { // Pass navigation as a prop
+  const { authData, loading } = useAuth();
   const [projects, setProjects] = useState([]);
   const [userData, setUserData] = useState(null);
   const [suggestedCollaborators, setSuggestedCollaborators] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (!loading && authData) {
@@ -20,7 +24,7 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     if (userData) {
-      suggestCollaborators(); // Fetch collaborators automatically once user data is available
+      suggestCollaborators();
     }
   }, [userData]);
 
@@ -42,20 +46,27 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  // Automatically suggest collaborators based on user description and skills
   const suggestCollaborators = async () => {
     try {
       const query = userData.description || userData.skills.join(", ");
-      const collaborators = await findUserMatch(query, userData._id); // Pass logged-in user ID to exclude it
-      setSuggestedCollaborators(collaborators.slice(0, 5)); // Show top 5 collaborators
+      const collaborators = await findUserMatch(query, userData._id);
+      setSuggestedCollaborators(collaborators.slice(0, 5));
     } catch (error) {
       console.error("Error finding user match:", error);
     }
   };
 
-  // Navigate to search page for further collaborator exploration
-  const handleSearchCollaborators = () => {
-    navigation.navigate("SearchPage"); // Replace "SearchPage" with the actual name of your search page screen
+  const handleSearch = async () => {
+    if (searchQuery.trim() === "") return;
+    setIsSearching(true);
+    try {
+      const results = await findUserMatch(searchQuery, userData._id);
+      setSearchResults(results);
+    } catch (error) {
+      console.error("Error searching collaborators:", error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const renderProject = ({ item }) => (
@@ -103,7 +114,7 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.collaboratorsHeader}>
         <Text style={styles.sectionTitle}>Suggested Collaborators</Text>
-        <Button title="Search" onPress={handleSearchCollaborators} />
+        <Button title="Search" onPress={() => setIsModalVisible(true)} />
       </View>
 
       {suggestedCollaborators.length === 0 ? (
@@ -115,6 +126,39 @@ export default function DashboardScreen({ navigation }) {
           renderItem={renderCollaborator}
         />
       )}
+
+      {/* Modal for Matchmaking Search */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Search Collaborators</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Enter keyword..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <Button title="Search" onPress={handleSearch} />
+
+            {isSearching ? (
+              <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
+            ) : (
+              <FlatList
+                data={searchResults}
+                keyExtractor={(item) => item._id.toString()}
+                renderItem={renderCollaborator}
+                ListEmptyComponent={<Text>No results found.</Text>}
+              />
+            )}
+            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -158,5 +202,30 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
   },
 });
