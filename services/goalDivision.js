@@ -1,5 +1,5 @@
-import axios from 'axios';
-
+import axios from "axios";
+//${process.env.BASE_URL}
 /**
  * Sends a task description to the /openai/TaskGen endpoint and returns the response.
  *
@@ -8,12 +8,15 @@ import axios from 'axios';
  */
 export const createTaskDivision = async (taskDescription) => {
   try {
-    const response = await axios.post(`http://${process.env.BASE_URL}/openai/TaskGen`, {
-      task: taskDescription,
-    });
+    const response = await axios.post(
+      `http://${process.env.BASE_URL}/openai/TaskGen`,
+      {
+        task: taskDescription,
+      }
+    );
     return response.data;
   } catch (error) {
-    console.error('Error creating task division:', error);
+    console.error("Error creating task division:", error);
     throw error;
   }
 };
@@ -27,23 +30,31 @@ export const createTaskDivision = async (taskDescription) => {
  * @param {Array} tasks - The tasks to be included in the project.
  * @returns {Promise<object>} - The API response confirming the project was saved.
  */
-export const saveProjectToDatabase = async (projectName, projectDescription, ownerEmail, tasks) => {
+export const saveTasksToDatabase = async (
+  projectName,
+  projectDescription,
+  ownerEmail,
+  tasks
+) => {
   const projectData = {
     projectName,
     description: projectDescription,
     ownerEmail,
-    collaborators: [{ email: ownerEmail, role: 'owner' }], // Add owner as the first collaborator
+    collaborators: [{ email: ownerEmail, role: "owner" }], // Add owner as the first collaborator
     goals: tasks.map((task) => ({
       title: task.stepTitle,
       description: task.description,
       status: "not started",
       assignedTo: task.assignedTo || ownerEmail, // Assign to the owner if not specified
-      estimatedTime: task.estimatedTime || "" // Include estimated time if available
+      estimatedTime: task.estimatedTime || "", // Include estimated time if available
     })),
   };
 
   try {
-    const response = await axios.post(`http://${process.env.BASE_URL}/projects/create`, projectData);
+    const response = await axios.post(
+      `http://${process.env.BASE_URL}/projects/create`,
+      projectData
+    );
     console.log("Project and tasks saved successfully:", response.data);
     return response.data;
   } catch (error) {
