@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from "react-native";
-import { getUserByEmail } from "../services/userServices";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { useAuth } from "../contexts/auth";
+import { getUserByEmail, updateUser } from "../services/userServices";
 
 export default function UserProfileScreen() {
-  const { authData, loading } = useAuth(); // Get authData and loading from context
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const { authData, loading } = useAuth();
   const [skills, setSkills] = useState("");
   const [description, setDescription] = useState("");
   const [openToCollaboration, setOpenToCollaboration] = useState(false);
-  const [userLoading, setUserLoading] = useState(true); // Loading state for user data
+  const [userLoading, setUserLoading] = useState(true);
 
-  // Function to load the user's profile using getUserByEmail
   const loadUserProfile = async () => {
     try {
       if (authData && authData.email) {
         const userData = await getUserByEmail(authData.email);
-        setName(userData.name);
-        setEmail(userData.email);
-        setSkills(userData.skills.join(", ")); // Convert skills array to comma-separated string
+        setSkills(userData.skills.join(", "));
         setDescription(userData.description);
         setOpenToCollaboration(userData.openToCollaboration);
       }
@@ -27,20 +22,27 @@ export default function UserProfileScreen() {
       console.error("Failed to load profile:", error);
       Alert.alert("Error", "Failed to load profile information.");
     } finally {
-      setUserLoading(false); // Stop loading once data is fetched
+      setUserLoading(false);
+    }
+  };
+
+  const handleUpdateField = async (field, value) => {
+    try {
+      const updatedUser = await updateUser(authData.email, { [field]: value });
+      Alert.alert("Success", `${field} updated successfully`);
+    } catch (error) {
+      console.error(`Failed to update ${field}:`, error);
+      Alert.alert("Error", `Failed to update ${field}`);
     }
   };
 
   useEffect(() => {
-    // Load user profile when the screen loads
     if (!loading) {
       loadUserProfile();
     }
   }, [loading, authData]);
 
-
   if (loading || userLoading) {
-    // Show a loading spinner while fetching data
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -54,24 +56,12 @@ export default function UserProfileScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        editable={false} // Make email non-editable
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Skills (comma-separated)"
         value={skills}
         onChangeText={setSkills}
       />
+      <Button title="Update Skills" onPress={() => handleUpdateField("skills", skills.split(", ").map(s => s.trim()))} />
+
       <TextInput
         style={styles.input}
         placeholder="Description"
@@ -79,15 +69,18 @@ export default function UserProfileScreen() {
         onChangeText={setDescription}
         multiline
       />
+      <Button title="Update Description" onPress={() => handleUpdateField("description", description)} />
+
       <View style={styles.checkboxContainer}>
         <Text>Open to Collaboration:</Text>
         <Button
           title={openToCollaboration ? "Yes" : "No"}
-          onPress={() => setOpenToCollaboration(!openToCollaboration)}
+          onPress={() => {
+            setOpenToCollaboration(!openToCollaboration);
+            handleUpdateField("openToCollaboration", !openToCollaboration);
+          }}
         />
       </View>
-
-      
     </View>
   );
 }
