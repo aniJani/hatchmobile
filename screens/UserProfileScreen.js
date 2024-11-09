@@ -1,56 +1,52 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import axios from "axios";
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from "react-native";
+import { getUserByEmail } from "../services/userServices";
+import { useAuth } from "../contexts/auth";
 
-export default function UserProfileScreen({ navigation }) {
+export default function UserProfileScreen() {
+  const { authData, loading } = useAuth(); // Get authData and loading from context
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [skills, setSkills] = useState("");
+  const [description, setDescription] = useState("");
+  const [openToCollaboration, setOpenToCollaboration] = useState(false);
+  const [userLoading, setUserLoading] = useState(true); // Loading state for user data
 
-  // Function to load the user's profile (simulated for now)
+  // Function to load the user's profile using getUserByEmail
   const loadUserProfile = async () => {
     try {
-      // Fetch user data from the backend
-      const response = await axios.get("http://localhost:5000/user/profile");
-      const userData = response.data;
-
-      // Set the user's data in state variables
-      setName(userData.name);
-      setEmail(userData.email);
-      setSkills(userData.skills.join(", ")); // Convert skills array to comma-separated string
+      if (authData && authData.email) {
+        const userData = await getUserByEmail(authData.email);
+        setName(userData.name);
+        setEmail(userData.email);
+        setSkills(userData.skills.join(", ")); // Convert skills array to comma-separated string
+        setDescription(userData.description);
+        setOpenToCollaboration(userData.openToCollaboration);
+      }
     } catch (error) {
       console.error("Failed to load profile:", error);
       Alert.alert("Error", "Failed to load profile information.");
+    } finally {
+      setUserLoading(false); // Stop loading once data is fetched
     }
   };
 
   useEffect(() => {
     // Load user profile when the screen loads
-    loadUserProfile();
-  }, []);
-
-  const handleUpdateProfile = async () => {
-    // Convert skills to an array by splitting the input on commas
-    const skillsArray = skills.split(",").map((skill) => skill.trim());
-
-    try {
-      // Update user data on the backend
-      const response = await axios.put("http://localhost:5000/user/profile", {
-        name,
-        email,
-        skills: skillsArray,
-      });
-
-      if (response.status === 200) {
-        Alert.alert("Success", "Profile updated successfully!");
-      } else {
-        Alert.alert("Error", "Failed to update profile.");
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Something went wrong while updating the profile.");
+    if (!loading) {
+      loadUserProfile();
     }
-  };
+  }, [loading, authData]);
+
+
+  if (loading || userLoading) {
+    // Show a loading spinner while fetching data
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -68,6 +64,7 @@ export default function UserProfileScreen({ navigation }) {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        editable={false} // Make email non-editable
       />
       <TextInput
         style={styles.input}
@@ -75,8 +72,22 @@ export default function UserProfileScreen({ navigation }) {
         value={skills}
         onChangeText={setSkills}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Description"
+        value={description}
+        onChangeText={setDescription}
+        multiline
+      />
+      <View style={styles.checkboxContainer}>
+        <Text>Open to Collaboration:</Text>
+        <Button
+          title={openToCollaboration ? "Yes" : "No"}
+          onPress={() => setOpenToCollaboration(!openToCollaboration)}
+        />
+      </View>
 
-      <Button title="Update Profile" onPress={handleUpdateProfile} />
+      
     </View>
   );
 }
@@ -88,6 +99,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#fff",
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   title: {
     fontSize: 24,
     marginBottom: 20,
@@ -98,6 +114,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#ccc",
     padding: 10,
+    marginVertical: 10,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10,
   },
 });
