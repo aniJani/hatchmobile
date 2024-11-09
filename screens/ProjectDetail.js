@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Button, ActivityIndicator } from "react-native";
-import { getProjectById } from "../services/projectServices"; // Import the function to fetch project details
+import { View, Text, StyleSheet, ActivityIndicator, Button, ScrollView } from "react-native";
+import { getProjectById } from "../services/projectServices";
 
 export default function ProjectDetailScreen({ route, navigation }) {
-  const { projectId } = route.params; // Get the projectId from the route parameters
+  const { projectId } = route.params;
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,12 +36,12 @@ export default function ProjectDetailScreen({ route, navigation }) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>{project.projectName}</Text>
       <Text style={styles.description}>{project.description}</Text>
-      
+
       <Text style={styles.sectionTitle}>Collaborators:</Text>
-      {project.collaborators.length > 0 ? (
+      {Array.isArray(project.collaborators) && project.collaborators.length > 0 ? (
         project.collaborators.map((collaborator, index) => (
           <Text key={index}>
             {collaborator.email} - {collaborator.role}
@@ -52,16 +52,22 @@ export default function ProjectDetailScreen({ route, navigation }) {
       )}
 
       <Text style={styles.sectionTitle}>Goals:</Text>
-      {project.goals.length > 0 ? (
+      {Array.isArray(project.goals) && project.goals.length > 0 ? (
         project.goals.map((goal, index) => (
-          <Text key={index}>{goal}</Text>
+          <View key={index} style={styles.goalItem}>
+            <Text style={styles.goalTitle}>{goal.title}</Text>
+            <Text style={styles.goalDescription}>{goal.description}</Text>
+            <Text>Status: {goal.status}</Text>
+            <Text>Assigned to: {goal.assignedTo}</Text>
+            <Text>Estimated Time: {goal.estimatedTime}</Text>
+          </View>
         ))
       ) : (
         <Text>No goals specified.</Text>
       )}
 
       <Button title="Go Back" onPress={() => navigation.goBack()} />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -92,5 +98,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "red",
     textAlign: "center",
+  },
+  goalItem: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+  },
+  goalTitle: {
+    fontWeight: "bold",
+  },
+  goalDescription: {
+    marginBottom: 5,
   },
 });

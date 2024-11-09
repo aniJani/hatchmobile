@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Button, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, StyleSheet, Button, ActivityIndicator} from "react-native";
 import { loadProjects, loadTasks } from "../services/projectServices";
 import { useAuth } from "../contexts/auth";
 import { getUserByEmail } from "../services/userServices";
@@ -53,6 +53,7 @@ export default function DashboardScreen({ navigation }) {
         title="View Project"
         onPress={() => navigation.navigate("ProjectDetail", { projectId: item._id })}
       />
+
     </View>
   );
 

@@ -29,3 +29,12 @@ export const loadTasks = async () => {
     throw error;
   }
 };
+export const getProjectById = async (projectId) => {
+  try {
+    const response = await axios.get(`http://${process.env.BASE_URL}/projects/${projectId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching project details:", error);
+    throw error;
+  }
+};
