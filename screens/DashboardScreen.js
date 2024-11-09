@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Button, ActivityIndicator } from "react-native";
-import { loadProjects } from "../services/projectServices";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../contexts/auth";
+import { findUserMatch } from "../services/matchFinder";
+import { loadProjects } from "../services/projectServices";
 import { getUserByEmail } from "../services/userServices";
 
 export default function DashboardScreen({ navigation }) {
@@ -14,9 +15,14 @@ export default function DashboardScreen({ navigation }) {
     if (!loading && authData) {
       fetchUserData();
       fetchProjects();
-      suggestCollaborators();
     }
   }, [loading, authData]);
+
+  useEffect(() => {
+    if (userData) {
+      suggestCollaborators(); // Fetch collaborators automatically once user data is available
+    }
+  }, [userData]);
 
   const fetchUserData = async () => {
     try {
@@ -36,21 +42,20 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  // Function to suggest collaborators (placeholder logic)
-  const suggestCollaborators = () => {
-    // Placeholder logic for suggesting collaborators
-    // You may replace this with real logic based on your use case
-    const collaborators = [
-      { id: 1, name: "Alice Johnson", email: "alice@example.com" },
-      { id: 2, name: "Bob Smith", email: "bob@example.com" },
-      { id: 3, name: "Charlie Davis", email: "charlie@example.com" },
-    ];
-    setSuggestedCollaborators(collaborators);
+  // Automatically suggest collaborators based on user description and skills
+  const suggestCollaborators = async () => {
+    try {
+      const query = userData.description || userData.skills.join(", ");
+      const collaborators = await findUserMatch(query, userData._id); // Pass logged-in user ID to exclude it
+      setSuggestedCollaborators(collaborators.slice(0, 5)); // Show top 5 collaborators
+    } catch (error) {
+      console.error("Error finding user match:", error);
+    }
   };
 
+  // Navigate to search page for further collaborator exploration
   const handleSearchCollaborators = () => {
-    // Implement your search logic here
-    console.log("Search button clicked!");
+    navigation.navigate("SearchPage"); // Replace "SearchPage" with the actual name of your search page screen
   };
 
   const renderProject = ({ item }) => (
@@ -68,6 +73,8 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{item.name}</Text>
       <Text>Email: {item.email}</Text>
+      <Text>Description: {item.description}</Text>
+      <Text>Skills: {item.skills.join(", ")}</Text>
     </View>
   );
 
@@ -104,7 +111,7 @@ export default function DashboardScreen({ navigation }) {
       ) : (
         <FlatList
           data={suggestedCollaborators}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item._id.toString()}
           renderItem={renderCollaborator}
         />
       )}

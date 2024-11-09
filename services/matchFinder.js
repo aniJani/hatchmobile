@@ -1,24 +1,21 @@
 import { BASE_URL } from '@env';
 import axios from 'axios';
 
-/**
- * Searches and sorts by matching query.
- *
- * @param {string} queryIn - The queryIn to search for in user profiles.
- * @returns {Promise<object[]>} - The API response containing the list of matched users.
- */
-export const findUserMatch = async (queryIn) => {
+export const findUserMatch = async (queryIn, loggedInUserId) => {
     try {
-        const response = await axios.post(`${BASE_URL}/user/match`, {
+        const response = await axios.post(`http://${BASE_URL}/user/match`, {
             query: queryIn,
         });
-        return response.data; // Returns the list of matched users from the API response
+
+        // Filter out the logged-in user from the matched users
+        const matchedUsers = response.data.filter(user => user._id !== loggedInUserId);
+
+        return matchedUsers; // Return the list of matched users, excluding the logged-in user
     } catch (error) {
         console.error('Error finding user match:', error);
         throw error;
     }
 };
-
 /**
  * Searches for users by a given query.
  *
