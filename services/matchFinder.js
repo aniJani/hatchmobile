@@ -102,3 +102,16 @@ export const findUserMatch = async (queryIn, loggedInUserId) => {
     }
 ]
  */
+export const findProjectCollaboratorMatch = async (projectId, query) => {
+    try {
+        const response = await axios.post(`http://${BASE_URL}/project/match-collaborators`, {
+            projectId,
+            query
+        });
+
+        return response.data; // Returns the list of matched collaborators within the project
+    } catch (error) {
+        console.error('Error finding project collaborator match:', error);
+        throw error;
+    }
+};
