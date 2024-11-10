@@ -1,5 +1,6 @@
 // services/userServices.js
 import axios from "axios";
+import * as Notifications from "expo-notifications";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -9,8 +10,15 @@ export const registerUser = async ({ name, email, password, description, skills,
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Update the user profile with display name
+    // Update the user profile with the display name
     await updateProfile(user, { displayName: name });
+
+    // Get the Expo Push Token
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      await Notifications.requestPermissionsAsync();
+    }
+    const expoPushToken = (await Notifications.getExpoPushTokenAsync()).data;
 
     // Prepare data for MongoDB
     const userData = {
@@ -19,9 +27,10 @@ export const registerUser = async ({ name, email, password, description, skills,
       description,
       skills: skills.split(',').map((skill) => skill.trim()), // Convert comma-separated skills to array
       openToCollaboration,
+      expoPushToken, // Include the Expo Push Token
     };
 
-    // Send data to backend
+    // Send data to the backend
     const response = await fetch(`http://${process.env.BASE_URL}/user/register`, {
       method: 'POST',
       headers: {
@@ -32,7 +41,7 @@ export const registerUser = async ({ name, email, password, description, skills,
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to register user in database.');
+      throw new Error(errorData.error || 'Failed to register user in the database.');
     }
 
     return { user };

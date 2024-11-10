@@ -5,8 +5,10 @@ import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 import { loadProjects } from "../services/projectServices";
 import { getUserByEmail } from "../services/userServices";
+import { registerForPushNotificationsAsync } from "../services/notificationsService";
+import * as Notifications from "expo-notifications";
 
-export default function DashboardScreen({ navigation }) {
+export default function DashboardScreen({ navigation }) { 
   const { authData, loading } = useAuth();
   const [projects, setProjects] = useState([]);
   const [userData, setUserData] = useState(null);
@@ -28,6 +30,31 @@ export default function DashboardScreen({ navigation }) {
     }
   }, [userData]);
 
+  // Register for push notifications
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) => {
+      if (token) {
+        // Optionally, send this token to your backend to store it for future notifications
+      }
+    });
+
+    // Listener for incoming notifications
+    const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
+      console.log("Notification received:", notification);
+    });
+
+    // Listener for when the user interacts with a notification
+    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log("Notification response received:", response);
+    });
+
+    return () => {
+      // Clean up listeners
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+  
   const fetchUserData = async () => {
     try {
       const data = await getUserByEmail(authData.email);
@@ -109,6 +136,8 @@ export default function DashboardScreen({ navigation }) {
           data={projects}
           keyExtractor={(item) => item._id.toString()}
           renderItem={renderProject}
+          horizontal={true} // Enable horizontal scrolling
+          showsHorizontalScrollIndicator={false}
         />
       )}
 
@@ -124,6 +153,8 @@ export default function DashboardScreen({ navigation }) {
           data={suggestedCollaborators}
           keyExtractor={(item) => item._id.toString()}
           renderItem={renderCollaborator}
+          horizontal={true} // Enable horizontal scrolling
+          showsHorizontalScrollIndicator={false}
         />
       )}
 
@@ -171,9 +202,10 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 15,
-    marginBottom: 10,
+    marginRight: 10, // Add margin to separate the cards horizontally
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
+    width: 250, // Set a fixed width for horizontal scrolling
   },
   cardTitle: {
     fontSize: 18,

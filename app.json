@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "hatchmobile",
-    "slug": "hatchmobile",
+    "slug": "hatchathon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,16 +12,31 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": "./assets/ios-notification-icon.png"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "notification": {
+        "icon": "./assets/android-notification-icon.png",
+        "color": "#ff0000"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#ffffff"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "328e739e-ab91-491f-b4f5-f13af18d0018"
+      }
+    },
+    "owner": "pratimarajbanshi"
   }
 }
