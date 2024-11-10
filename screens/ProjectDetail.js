@@ -190,6 +190,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
         onClose={() => setAssignModalVisible(false)}
         projectCollaborators={project.collaborators}
         goalDescription={updatedProject.goals[selectedGoalIndex]?.description || ""}
+        navigation={navigation}
         onSelectCollaborator={assignCollaboratorToGoal}
       />
 

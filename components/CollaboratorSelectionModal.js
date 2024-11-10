@@ -16,6 +16,7 @@ export default function CollaboratorSelectionModal({
     projectCollaborators,
     goalDescription,
     onSelectCollaborator,
+    navigation, // Ensure navigation is passed to use
 }) {
     const [collaborators, setCollaborators] = useState([]);
     const [isFetching, setIsFetching] = useState(false);
@@ -34,10 +35,15 @@ export default function CollaboratorSelectionModal({
             if (scope === "internal") {
                 results = projectCollaborators;
             } else {
-                results = await findUserMatch(goalDescription);
-                results = results.filter(
-                    (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
-                );
+                // Check goalDescription is available for the external scope
+                if (goalDescription) {
+                    results = await findUserMatch(goalDescription);
+                    results = results.filter(
+                        (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
+                    );
+                } else {
+                    console.warn("Goal description is missing.");
+                }
             }
             setCollaborators(results);
         } catch (error) {
@@ -68,7 +74,9 @@ export default function CollaboratorSelectionModal({
                             data={collaborators}
                             keyExtractor={(item) => item.email}
                             renderItem={({ item }) => (
-                                <TouchableOpacity onPress={() => onSelectCollaborator(item.email)}>
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        navigation.navigate("ColabProfilePage", { collaborator: item })}>
                                     <View style={styles.collaboratorItem}>
                                         <Text>{item.name || "Collaborator"}</Text>
                                         <Text>{item.email}</Text>

@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from './contexts/auth'; // Adjust the path if necessary
-
+import ColabProfilePage from './screens/ColabProfilePage';
 import DashboardScreen from './screens/DashboardScreen';
 import InitProject from './screens/InitProject';
 import MatchmakingScreen from './screens/MatchmakingScreen';
@@ -77,6 +77,10 @@ const AppStack = () => (
       name="MatchmakingScreen"
       component={MatchmakingScreen}
       options={{ headerShown: true, title: "Matchmaking Screen" }}
+    />
+    <Stack.Screen
+      name="ColabProfilePage"
+      component={ColabProfilePage}
     />
     {/* Add more stack screens if needed */}
   </Stack.Navigator>
