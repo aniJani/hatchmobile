@@ -5,17 +5,14 @@ import {
   ActivityIndicator,
   Alert,
   Button,
-  FlatList,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
+import CollaboratorSelectionModal from "../components/CollaboratorSelectionModal";
 import ProjectSearchModal from "../components/ProjectSearchModal";
-import { findProjectCollaboratorMatch, findUserMatch } from "../services/matchFinder"; // Import match functions
 import { editProjectById, getProjectById } from "../services/projectServices";
 
 export default function ProjectDetailScreen({ route, navigation }) {
@@ -26,9 +23,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
   const [editMode, setEditMode] = useState(false);
   const [updatedProject, setUpdatedProject] = useState({});
   const [assignModalVisible, setAssignModalVisible] = useState(false);
-  const [collaborators, setCollaborators] = useState([]);
   const [selectedGoalIndex, setSelectedGoalIndex] = useState(null);
-  const [searchScope, setSearchScope] = useState("internal");
 
   useEffect(() => {
     fetchProjectDetails();
@@ -74,24 +69,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
 
   const openAssignCollaboratorModal = (index) => {
     setSelectedGoalIndex(index);
-    setSearchScope("internal");
     setAssignModalVisible(true);
-    loadCollaborators("internal");
-  };
-
-  const loadCollaborators = async (scope) => {
-    try {
-      let results = [];
-      if (scope === "internal") {
-        results = project.collaborators;
-      } else {
-        results = await findUserMatch(updatedProject.description, project._id);
-      }
-      setCollaborators(results);
-    } catch (error) {
-      console.error("Error loading collaborators:", error);
-      Alert.alert("Error", "Failed to load collaborators.");
-    }
   };
 
   const assignCollaboratorToGoal = (email) => {
@@ -202,36 +180,18 @@ export default function ProjectDetailScreen({ route, navigation }) {
       <ProjectSearchModal
         visible={isProjectSearchModalVisible}
         onClose={() => setIsProjectSearchModalVisible(false)}
-        projectId={projectId} // Pass projectId to the modal
+        projectId={projectId}
         projectGoals={project.goals}
-        projectCollaborators={project.collaborators} // Pass current collaborators to filter them out
+        projectCollaborators={project.collaborators}
       />
 
-      <Modal visible={assignModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Assign Collaborator</Text>
-            <View style={styles.searchScopeContainer}>
-              <TouchableOpacity onPress={() => loadCollaborators("internal")}>
-                <Text style={styles.searchScopeText}>Internal</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => loadCollaborators("external")}>
-                <Text style={styles.searchScopeText}>External</Text>
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={collaborators}
-              keyExtractor={(item) => item.email}
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => assignCollaboratorToGoal(item.email)}>
-                  <Text style={styles.collaboratorItem}>{item.email}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <Button title="Close" onPress={() => setAssignModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+      <CollaboratorSelectionModal
+        visible={assignModalVisible}
+        onClose={() => setAssignModalVisible(false)}
+        projectCollaborators={project.collaborators}
+        goalDescription={updatedProject.goals[selectedGoalIndex]?.description || ""}
+        onSelectCollaborator={assignCollaboratorToGoal}
+      />
 
       <View style={styles.buttonContainer}>
         {editMode ? (

@@ -1,4 +1,3 @@
-// components/CollaboratorSelectionModal.js
 import React, { useEffect, useState } from "react";
 import {
     Button,
@@ -15,7 +14,7 @@ export default function CollaboratorSelectionModal({
     visible,
     onClose,
     projectCollaborators,
-    projectDescription,
+    goalDescription,
     onSelectCollaborator,
 }) {
     const [collaborators, setCollaborators] = useState([]);
@@ -35,8 +34,7 @@ export default function CollaboratorSelectionModal({
             if (scope === "internal") {
                 results = projectCollaborators;
             } else {
-                const query = projectDescription;
-                results = await findUserMatch(query);
+                results = await findUserMatch(goalDescription);
                 results = results.filter(
                     (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
                 );
@@ -72,7 +70,7 @@ export default function CollaboratorSelectionModal({
                             renderItem={({ item }) => (
                                 <TouchableOpacity onPress={() => onSelectCollaborator(item.email)}>
                                     <View style={styles.collaboratorItem}>
-                                        <Text>{item.name}</Text>
+                                        <Text>{item.name || "Collaborator"}</Text>
                                         <Text>{item.email}</Text>
                                     </View>
                                 </TouchableOpacity>
