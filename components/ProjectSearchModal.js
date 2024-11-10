@@ -1,14 +1,15 @@
 // components/ProjectSearchModal.js
 import React, { useEffect, useState } from "react";
 import { Button, FlatList, Modal, StyleSheet, Text, View } from "react-native";
+import { useAuth } from "../contexts/auth"; // Import useAuth to get the logged-in user ID
 import { findUserMatch } from "../services/matchFinder";
 
-export default function ProjectSearchModal({ visible, onClose, projectGoals }) {
+export default function ProjectSearchModal({ visible, onClose, projectId, projectGoals, projectCollaborators }) {
+  const { authData } = useAuth(); // Access the logged-in user's data
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    // Trigger search when the modal is opened
     if (visible) {
       handleSearchForMatches();
     }
@@ -19,10 +20,17 @@ export default function ProjectSearchModal({ visible, onClose, projectGoals }) {
 
     try {
       setIsSearching(true);
-      // Concatenate goals' titles and descriptions into a single query string
       const goalsQuery = projectGoals.map((goal) => `${goal.title} ${goal.description}`).join(" ");
-      const results = await findUserMatch(goalsQuery);
-      setSearchResults(results);
+
+      // Fetch all matching users
+      const results = await findUserMatch(goalsQuery, authData.userId);
+
+      // Filter out users already in the project's collaborators list
+      const filteredResults = results.filter(
+        (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
+      );
+
+      setSearchResults(filteredResults);
     } catch (error) {
       console.error("Error finding user matches:", error);
     } finally {

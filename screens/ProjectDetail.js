@@ -1,8 +1,21 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  FlatList,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import ProjectSearchModal from "../components/ProjectSearchModal";
+import { findProjectCollaboratorMatch, findUserMatch } from "../services/matchFinder"; // Import match functions
 import { editProjectById, getProjectById } from "../services/projectServices";
 
 export default function ProjectDetailScreen({ route, navigation }) {
@@ -12,6 +25,10 @@ export default function ProjectDetailScreen({ route, navigation }) {
   const [isProjectSearchModalVisible, setIsProjectSearchModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [updatedProject, setUpdatedProject] = useState({});
+  const [assignModalVisible, setAssignModalVisible] = useState(false);
+  const [collaborators, setCollaborators] = useState([]);
+  const [selectedGoalIndex, setSelectedGoalIndex] = useState(null);
+  const [searchScope, setSearchScope] = useState("internal");
 
   useEffect(() => {
     fetchProjectDetails();
@@ -22,7 +39,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
       setLoading(true);
       const projectData = await getProjectById(projectId);
       setProject(projectData);
-      setUpdatedProject(projectData); // Initialize updatedProject with fetched project data
+      setUpdatedProject(projectData);
     } catch (error) {
       console.error("Error fetching project details:", error);
     } finally {
@@ -35,7 +52,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
       await editProjectById(projectId, updatedProject);
       Alert.alert("Success", "Project updated successfully");
       setEditMode(false);
-      fetchProjectDetails(); // Refresh the project details
+      fetchProjectDetails();
     } catch (error) {
       console.error("Error updating project:", error);
       Alert.alert("Error", "Failed to update project. Please try again.");
@@ -53,6 +70,35 @@ export default function ProjectDetailScreen({ route, navigation }) {
         [field]: value,
       }));
     }
+  };
+
+  const openAssignCollaboratorModal = (index) => {
+    setSelectedGoalIndex(index);
+    setSearchScope("internal");
+    setAssignModalVisible(true);
+    loadCollaborators("internal");
+  };
+
+  const loadCollaborators = async (scope) => {
+    try {
+      let results = [];
+      if (scope === "internal") {
+        results = project.collaborators;
+      } else {
+        results = await findUserMatch(updatedProject.description, project._id);
+      }
+      setCollaborators(results);
+    } catch (error) {
+      console.error("Error loading collaborators:", error);
+      Alert.alert("Error", "Failed to load collaborators.");
+    }
+  };
+
+  const assignCollaboratorToGoal = (email) => {
+    const updatedGoals = [...updatedProject.goals];
+    updatedGoals[selectedGoalIndex].assignedTo = email;
+    setUpdatedProject((prev) => ({ ...prev, goals: updatedGoals }));
+    setAssignModalVisible(false);
   };
 
   if (loading) {
@@ -128,16 +174,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
                 </Picker>
 
                 <Text style={styles.goalSectionLabel}>Assigned To:</Text>
-                <Picker
-                  selectedValue={goal.assignedTo}
-                  style={styles.picker}
-                  onValueChange={(itemValue) => handleInputChange("assignedTo", itemValue, index)}
-                >
-                  <Picker.Item label="Select Collaborator" value="" />
-                  {project.collaborators.map((collaborator, idx) => (
-                    <Picker.Item key={idx} label={collaborator.email} value={collaborator.email} />
-                  ))}
-                </Picker>
+                <Button title="Assign Collaborator" onPress={() => openAssignCollaboratorModal(index)} />
 
                 <Text style={styles.goalSectionLabel}>Estimated Time:</Text>
                 <TextInput
@@ -165,8 +202,36 @@ export default function ProjectDetailScreen({ route, navigation }) {
       <ProjectSearchModal
         visible={isProjectSearchModalVisible}
         onClose={() => setIsProjectSearchModalVisible(false)}
-        projectGoals={project.goals} // Pass the goals array to the modal
+        projectId={projectId} // Pass projectId to the modal
+        projectGoals={project.goals}
+        projectCollaborators={project.collaborators} // Pass current collaborators to filter them out
       />
+
+      <Modal visible={assignModalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Assign Collaborator</Text>
+            <View style={styles.searchScopeContainer}>
+              <TouchableOpacity onPress={() => loadCollaborators("internal")}>
+                <Text style={styles.searchScopeText}>Internal</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => loadCollaborators("external")}>
+                <Text style={styles.searchScopeText}>External</Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={collaborators}
+              keyExtractor={(item) => item.email}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => assignCollaboratorToGoal(item.email)}>
+                  <Text style={styles.collaboratorItem}>{item.email}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <Button title="Close" onPress={() => setAssignModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.buttonContainer}>
         {editMode ? (
@@ -250,6 +315,40 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  searchScopeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 10,
+  },
+  searchScopeText: {
+    fontSize: 16,
+    color: "#2196F3",
+  },
+  collaboratorItem: {
+    padding: 10,
+    fontSize: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    textAlign: "center",
   },
   errorText: {
     fontSize: 16,
