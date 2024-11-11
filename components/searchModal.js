@@ -111,7 +111,7 @@ export default function SearchModal({
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     {/* Header with Close Icon */}
-                    <View style={styles.buttonRow}>
+                    <View style={styles.headerRow}>
                         <Text style={styles.modalTitle}>Search Collaborators</Text>
                         <TouchableOpacity style={styles.iconButton} onPress={handleModalClose}>
                             <MaterialIcons name="close" size={24} color="#fff" />
@@ -144,7 +144,7 @@ export default function SearchModal({
                     {searchMode === "keyword" || searchMode === "email" ? (
                         <>
                             {/* Search Input and Button */}
-                            <View style={styles.buttonRow}>
+                            <View style={styles.searchRow}>
                                 <TextInput
                                     style={styles.searchInput}
                                     placeholder={
@@ -228,7 +228,7 @@ export default function SearchModal({
                             />
                         ) : (
                             // Display list of members
-                            <View>
+                            <View style={styles.membersContainer}>
                                 {/* Back button to go back to organizations list */}
                                 <TouchableOpacity
                                     style={styles.backButton}
@@ -259,7 +259,7 @@ export default function SearchModal({
             </View>
         </Modal>
     );
-}
+} // <-- Added this closing brace
 
 const styles = StyleSheet.create({
     modalContainer: {
@@ -275,26 +275,55 @@ const styles = StyleSheet.create({
         backgroundColor: "#272222",
         borderRadius: 10,
     },
+    headerRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
     modalTitle: {
         fontSize: 20,
         marginBottom: 10,
         textAlign: "center",
         color: "#fff",
     },
+    modeSelector: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        marginBottom: 15,
+    },
+    modeButton: {
+        flex: 1,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: "#444",
+        borderRadius: 5,
+        marginHorizontal: 5,
+        marginVertical: 5,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    activeModeButton: {
+        backgroundColor: "#555",
+    },
+    modeButtonText: {
+        color: "#fff",
+        fontSize: 14,
+    },
+    searchRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 15,
+    },
     searchInput: {
+        flex: 1,
         borderWidth: 1,
         borderColor: "#444",
         padding: 10,
-        marginBottom: 10,
         borderRadius: 5,
         color: "#fff",
-        width: 280,
-    },
-    buttonRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 15,
-        alignItems: "center",
+        marginRight: 10,
     },
     iconButton: {
         padding: 10,
@@ -313,26 +342,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "rgba(255, 255, 255, 0.5)",
     },
-    modeSelector: {
-        flexDirection: "row",
-        justifyContent: "center",
-        marginBottom: 15,
-    },
-    modeButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderWidth: 1,
-        borderColor: "#444",
-        borderRadius: 5,
-        marginHorizontal: 5,
-    },
-    activeModeButton: {
-        backgroundColor: "#555",
-    },
-    modeButtonText: {
-        color: "#fff",
-        fontSize: 16,
-    },
     backButton: {
         paddingVertical: 10,
         paddingHorizontal: 15,
@@ -349,5 +358,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: "#FFFFFF",
         marginBottom: 10,
+    },
+    membersContainer: {
+        flex: 1,
     },
 });
