@@ -1,21 +1,20 @@
 // App.js
-import { Ionicons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { AuthProvider, useAuth } from './contexts/auth'; // Adjust the path if necessary
-import ColabProfilePage from './screens/ColabProfilePage';
-import DashboardScreen from './screens/DashboardScreen';
-import InitProject from './screens/InitProject';
-import InvitesScreen from './screens/InvitesScreen';
-import MatchmakingScreen from './screens/MatchmakingScreen';
-import ProjectDetailScreen from './screens/ProjectDetail'; // Import ProjectDetailScreen
-import RegisterScreen from './screens/RegisterScreen';
-import SignInScreen from './screens/SigninScreen';
-import UserProfileScreen from './screens/UserProfileScreen';
-
+import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
+import { ActivityIndicator, View } from "react-native";
+import { AuthProvider, useAuth } from "./contexts/auth"; // Adjust the path if necessary
+import ColabProfilePage from "./screens/ColabProfilePage";
+import DashboardScreen from "./screens/DashboardScreen";
+import InitProject from "./screens/InitProject";
+import InvitesScreen from "./screens/InvitesScreen";
+import MatchmakingScreen from "./screens/MatchmakingScreen";
+import ProjectDetailScreen from "./screens/ProjectDetail"; // Import ProjectDetailScreen
+import RegisterScreen from "./screens/RegisterScreen";
+import SignInScreen from "./screens/SigninScreen";
+import UserProfileScreen from "./screens/UserProfileScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -27,34 +26,34 @@ const AppTabs = () => (
         let iconName;
 
         // Determine the icon based on the route name
-        if (route.name === 'Dashboard') {
-          iconName = 'home-outline';
-        } else if (route.name === 'Profile') {
-          iconName = 'person-outline';
-        } else if (route.name === 'New Project') {
-          iconName = 'add-circle-outline';
+        if (route.name === "Dashboard") {
+          iconName = "home-outline";
+        } else if (route.name === "Profile") {
+          iconName = "person-outline";
+        } else if (route.name === "New Project") {
+          iconName = "add-circle-outline";
         }
 
         // Return the Ionicons component with the appropriate icon
         return <Ionicons name={iconName} size={size} color={color} />;
       },
       tabBarStyle: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 10,
         left: 10,
         right: 10,
-        backgroundColor: "#1640D6", // Blue background
+        backgroundColor: "#535353", // Blue background
         borderRadius: 30,
         height: 60,
         margin: 10,
         padding: 10,
-        justifyContent: 'center', // Center items vertically
-        alignItems: 'center',
+        justifyContent: "center", // Center items vertically
+        alignItems: "center",
         borderTopWidth: 0, // Remove top border
-        shadowOpacity: 0,  // Disable shadow
+        shadowOpacity: 0, // Disable shadow
       },
-      tabBarActiveTintColor: '#ffffff', // White color for active icon
-      tabBarInactiveTintColor: '#272222',
+      tabBarActiveTintColor: "#ffffff", // White color for active icon
+      tabBarInactiveTintColor: "#272222",
       //tabBarShowLabel: false, // Hide tab labels
       headerShown: false,
     })}
@@ -65,10 +64,12 @@ const AppTabs = () => (
   </Tab.Navigator>
 );
 
-
 // AuthStack: Screens for authentication
 const AuthStack = () => (
-  <Stack.Navigator initialRouteName="Register" screenOptions={{ headerShown: false }}>
+  <Stack.Navigator
+    initialRouteName="Register"
+    screenOptions={{ headerShown: false }}
+  >
     <Stack.Screen name="SignIn" component={SignInScreen} />
     <Stack.Screen name="Register" component={RegisterScreen} />
   </Stack.Navigator>
@@ -86,19 +87,13 @@ const AppStack = () => (
       component={ProjectDetailScreen}
       options={{ headerShown: false, title: "Project Details" }}
     />
-    <Stack.Screen
-      name="InvitesScreen"
-      component={InvitesScreen}
-    />
+    <Stack.Screen name="InvitesScreen" component={InvitesScreen} />
     <Stack.Screen
       name="MatchmakingScreen"
       component={MatchmakingScreen}
       options={{ headerShown: false, title: "Matchmaking Screen" }}
     />
-    <Stack.Screen
-      name="ColabProfilePage"
-      component={ColabProfilePage}
-    />
+    <Stack.Screen name="ColabProfilePage" component={ColabProfilePage} />
     <Stack.Screen name="Dashboard" component={DashboardScreen} />
   </Stack.Navigator>
 );
@@ -110,9 +105,7 @@ const MainNavigator = () => {
   // Show a loading spinner while checking authentication status
   if (loading) {
     return (
-      <View
-        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-      >
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
