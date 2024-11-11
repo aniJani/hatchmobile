@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    
     textAlign: "center",
     marginBottom: 10,
     color: "#FFFFFF",
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   goalSectionLabel: {
-    fontWeight: "bold",
+
     marginTop: 10,
     color: "rgba(255, 255, 255, 0.5)",
   },

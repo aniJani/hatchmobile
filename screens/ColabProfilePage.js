@@ -68,8 +68,8 @@ export default function ColabProfilePage({ route, navigation }) {
 
             {selectedProject && (
                 <View style={styles.projectDetails}>
-                    <Text style={styles.projectDetailsTitle}>Selected Project Details</Text>
-                    <Text style={styles.text}>Name: {selectedProject.projectName}</Text>
+                    
+                    <Text style={styles.projectDetailsTitle}>{selectedProject.projectName}</Text>
                     <Text style={styles.text}>Description: {selectedProject.description}</Text>
 
                     <TouchableOpacity
@@ -87,9 +87,9 @@ export default function ColabProfilePage({ route, navigation }) {
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, paddingTop: 45, backgroundColor: "#272222" },
-    name: { fontSize: 24, fontWeight: "bold", marginBottom: 10, color: "#fff" },
+    name: { fontSize: 20, marginBottom: 10, color: "#fff" },
     text: { fontSize: 16, color: "rgba(255, 255, 255, 0.7)", marginBottom: 5 },
-    sectionTitle: { fontSize: 18, fontWeight: "bold", marginTop: 20, marginBottom: 10, color: "#fff" },
+    sectionTitle: { fontSize: 18, marginTop: 20, marginBottom: 10, color: "#fff" },
     
     projectCard: {
         backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
         padding: 15,
         marginVertical: 8,
     },
-    projectName: { fontSize: 18, fontWeight: "bold", color: "#fff" },
+    projectName: { fontSize: 16,  color: "#fff" },
     projectDescription: { fontSize: 14, color: "rgba(255, 255, 255, 0.7)", marginTop: 5 },
 
     projectDetails: {
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     },
     projectDetailsTitle: {
         fontSize: 18,
-        fontWeight: "bold",
+        
         marginBottom: 10,
         color: "#fff",
     },
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         padding: 10,
-        backgroundColor: "#2196F3",
+        backgroundColor: "#1640D6",
         borderRadius: 5,
         marginTop: 15,
     },
     inviteButtonText: {
         color: "#fff",
-        fontWeight: "bold",
+        
         marginLeft: 5,
     },
 });

@@ -183,13 +183,13 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, paddingTop: 45, backgroundColor: "#272222", paddingBottom: 80 },
   headerContainer: { flexDirection: 'row', justifyContent: 'space-between' },
-  title: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 20, color: "#FFFFFF" },
-  username: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
+  title: { fontSize: 20, textAlign: "center", marginBottom: 20, color: "#FFFFFF" },
+  username: { fontSize: 20, textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
   email: { fontSize: 16, textAlign: "center", marginBottom: 5, color: "#FFFFFF" },
   sectionTitle: { fontSize: 18, marginTop: 20, marginBottom: 10, color: "#FFFFFF" }, // Reduced marginBottom to 5
   inviteButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 10 },
   inviteIcon: { marginRight: 8 },
-  inviteText: { fontSize: 16, fontWeight: "bold", color: "#FFFFFF" },
+  
   collaboratorsHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }, // Reduced marginBottom to 5
   card: {
     padding: 12,

@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 16,
         color: "#fff",
-        fontWeight: "bold",
+        
         textAlign: "center",
         marginBottom: 10,
     },
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
         color: "#fff", // White text color
     },
     activeScope: {
-        fontWeight: "bold", // Bold text to indicate selection
+        
         color: "#fff", // White text color
     },
     collaboratorItem: {

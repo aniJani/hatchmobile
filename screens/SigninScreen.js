@@ -80,7 +80,7 @@ export default function SignInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "#272222",
     paddingTop: 45,
   },
   scrollViewContainer: {
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   signInButton: {
-    backgroundColor: "#2196F3",
+    backgroundColor: "#1640D6",
   },
   buttonText: {
     color: "#fff",
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   forgotPasswordText: {
-    color: "#2196F3",
+    color: "#1640D6",
     fontSize: 16,
   },
   registerText: {
     textAlign: "center",
     marginTop: 20,
-    color: "#2196F3",
+    color: "#1640D6",
     fontSize: 16,
   },
 });

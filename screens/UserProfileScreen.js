@@ -61,7 +61,7 @@ export default function UserProfileScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.username}>User Profile</Text>
+
       <Text style={styles.username}>{authData.name}</Text>
       <TextInput
         style={styles.input}
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#272222", // Dark background color
   },
-  username: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
+  username: { fontSize: 20, textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
   
   loadingContainer: {
     flex: 1,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     textAlign: "center",
-    fontWeight: "bold",
+    
     color: "#fff", // White text color
   },
   input: {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
     color: "#fff", // White text color
-    backgroundColor: "#3a3a3a", // Slightly darker background for input fields
+    backgroundColor: "rgba(255, 255, 255, 0.05)", // Slightly darker background for input fields
     borderRadius: 5, // Rounded borders for inputs
   },
   checkboxContainer: {
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#444", // Dark background for buttons
+    backgroundColor: "rgba(255, 255, 255, 0.05)", // Dark background for buttons
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff", // White text color for buttons
-    fontWeight: "bold",
+    
   },
   logoutButton: {
     backgroundColor: "#dc3545", // Red color for logout button

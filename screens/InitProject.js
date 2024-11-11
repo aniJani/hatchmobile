@@ -174,8 +174,8 @@ const styles = StyleSheet.create({
     paddingTop: 45
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 20,
+    
     textAlign: "center",
     marginBottom: 20,
     color: "#fff",
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    
     color: "#fff",
   },
   taskDetails: {
@@ -245,19 +245,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 10,
     width: "48%", // Set a fixed width for buttons
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "bold",
+    
     marginLeft: 5,
   },
-  generateButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-  },
-  saveButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-  },
-  editButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-  },
+  
+  
 });

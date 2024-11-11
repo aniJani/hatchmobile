@@ -163,7 +163,7 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#272222',
     paddingTop: 45,
   },
   scrollViewContainer: {
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#1640D6',
     padding: 15,
     alignItems: 'center',
     borderRadius: 5,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   signInLink: {
     marginTop: 20,
     textAlign: 'center',
-    color: '#2196F3',
+    color: '#1640D6',
   },
   errorText: {
     color: 'red',

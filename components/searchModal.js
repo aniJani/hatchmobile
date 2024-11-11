@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     modalTitle: {
-        fontSize: 22,
-        fontWeight: "bold",
+        fontSize: 20,
+        
         marginBottom: 10,
         textAlign: "center",
         color: "#fff", // White text color
@@ -128,16 +128,16 @@ const styles = StyleSheet.create({
     card: {
         padding: 15,
         marginBottom: 10,
-        backgroundColor: "#444", // Darker background for cards
+        backgroundColor: "rgba(255, 255, 255, 0.05)", // Darker background for cards
         borderRadius: 8,
     },
     cardTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
+        fontSize: 16,
+       
         color: "#fff", // White text color for card title
     },
     cardText: {
         fontSize: 14,
-        color: "rgba(255, 255, 255, 0.7)", // Lighter white text color
+        color: "rgba(255, 255, 255, 0.5)", // Lighter white text color
     },
 });

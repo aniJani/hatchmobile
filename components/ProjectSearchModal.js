@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: "bold",
+    
     marginBottom: 10,
     textAlign: "center",
     color: "#fff", // White text color
@@ -106,6 +106,6 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "#fff", // White text color
-    fontWeight: "bold",
+    
   },
 });

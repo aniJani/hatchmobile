@@ -195,10 +195,10 @@ export default function InvitesScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, paddingTop: 25, backgroundColor: "#272222" },
-    title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20, color: "#fff" },
-    card: { padding: 15, marginBottom: 10, backgroundColor: "#444", borderRadius: 8 },
-    cardTitle: { fontSize: 18, fontWeight: "bold", color: "#fff" },
+    container: { flex: 1, padding: 20, paddingTop: 45, backgroundColor: "#272222" },
+    title: { fontSize: 20, textAlign: "center", marginBottom: 20, color: "#fff" },
+    card: { padding: 15, marginBottom: 10, backgroundColor: "rgba(255, 255, 255, 0.05)", borderRadius: 8 },
+    cardTitle: { fontSize: 18, color: "#fff" },
     cardText: { color: "rgba(255, 255, 255, 0.7)" },
     modalBackground: {
         flex: 1,
@@ -216,18 +216,18 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
+        
         marginBottom: 10,
         color: "#fff",
     },
     modalDescription: {
         fontSize: 16,
-        color: "#fff",
+        color: "rgba(255, 255, 255, 0.5)",
         marginBottom: 10,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
+        
         marginTop: 15,
         marginBottom: 5,
         color: "#fff",
@@ -235,12 +235,12 @@ const styles = StyleSheet.create({
     goalContainer: {
         marginBottom: 10,
         padding: 10,
-        backgroundColor: '#333', // Darker background for goals
+        backgroundColor: "rgba(255, 255, 255, 0.05)",// Darker background for goals
         borderRadius: 5,
     },
     goalTitle: {
         fontSize: 16,
-        fontWeight: 'bold',
+        
         color: "#fff",
     },
     buttonRow: {
@@ -270,6 +270,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "#fff", // Text color white
         textAlign: "center",
-        fontWeight: "bold",
+        
     },
 });
