@@ -1,3 +1,5 @@
+// components/CollaboratorSelectionModal.js
+
 import React, { useEffect, useState } from "react";
 import {
     Button,
@@ -16,7 +18,7 @@ export default function CollaboratorSelectionModal({
     projectCollaborators,
     goalDescription,
     onSelectCollaborator,
-    navigation, // Ensure navigation is passed to use
+    navigation,
 }) {
     const [collaborators, setCollaborators] = useState([]);
     const [isFetching, setIsFetching] = useState(false);
@@ -35,11 +37,15 @@ export default function CollaboratorSelectionModal({
             if (scope === "internal") {
                 results = projectCollaborators;
             } else {
-                // Check goalDescription is available for the external scope
+                // Check if goalDescription is available for the external scope
                 if (goalDescription) {
                     results = await findUserMatch(goalDescription);
+                    // Exclude existing project collaborators
                     results = results.filter(
-                        (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
+                        (user) =>
+                            !projectCollaborators.some(
+                                (collaborator) => collaborator.email === user.email
+                            )
                     );
                 } else {
                     console.warn("Goal description is missing.");
@@ -53,17 +59,48 @@ export default function CollaboratorSelectionModal({
         }
     };
 
+    const handleCollaboratorSelect = (item) => {
+        if (scope === "internal") {
+            // Directly assign the collaborator
+            onSelectCollaborator(item.email);
+            onClose();
+        } else {
+            // Navigate to ColabProfilePage (existing logic)
+            navigation.navigate("ColabProfilePage", { collaborator: item });
+            onClose();
+        }
+    };
+
     return (
-        <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
+        <Modal
+            visible={visible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={onClose}
+        >
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Assign Collaborator</Text>
                     <View style={styles.scopeToggleContainer}>
                         <TouchableOpacity onPress={() => setScope("internal")}>
-                            <Text style={[styles.scopeText, scope === "internal" && styles.activeScope]}>Internal</Text>
+                            <Text
+                                style={[
+                                    styles.scopeText,
+                                    scope === "internal" && styles.activeScope,
+                                ]}
+                            >
+                                Internal
+                            </Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setScope("external")}>
-                            <Text style={[styles.scopeText, scope === "external" && styles.activeScope]}>External</Text>
+                            <Text
+                                style={[
+                                    styles.scopeText,
+                                    scope === "external" && styles.activeScope,
+                                ]}
+                            >
+                                External
+                            </Text>
                         </TouchableOpacity>
                     </View>
 
@@ -75,8 +112,8 @@ export default function CollaboratorSelectionModal({
                             keyExtractor={(item) => item.email}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
-                                    onPress={() =>
-                                        navigation.navigate("ColabProfilePage", { collaborator: item })}>
+                                    onPress={() => handleCollaboratorSelect(item)}
+                                >
                                     <View style={styles.collaboratorItem}>
                                         <Text>{item.name || "Collaborator"}</Text>
                                         <Text>{item.email}</Text>
@@ -102,6 +139,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: "80%",
+        maxHeight: "80%",
         padding: 20,
         backgroundColor: "#fff",
         borderRadius: 10,
