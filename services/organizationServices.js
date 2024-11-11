@@ -24,3 +24,15 @@ export const getUserOrganizations = async (email) => {
         throw error.response ? error.response.data : error;
     }
 };
+
+export const joinOrganization = async (email, inviteCode) => {
+    try {
+        const response = await axios.post(`http://${process.env.BASE_URL}/organizations`, {
+            inviteCode,
+            email,
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : error;
+    }
+}

@@ -4,15 +4,26 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../contexts/auth';
-import { createOrganization, getUserOrganizations } from '../services/organizationServices'; // Import your service functions
+import {
+    createOrganization,
+    getUserOrganizations,
+    joinOrganization, // Import the joinOrganization function
+} from '../services/organizationServices'; // Import your service functions
 
 export default function OrganizationsScreen({ navigation }) {
     const { authData } = useAuth();
     const [organizations, setOrganizations] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    // State for Create Organization Modal
+    const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
     const [orgName, setOrgName] = useState('');
-    const [message, setMessage] = useState('');
+    const [createMessage, setCreateMessage] = useState('');
+
+    // State for Join Organization Modal
+    const [isJoinModalVisible, setIsJoinModalVisible] = useState(false);
+    const [inviteCode, setInviteCode] = useState('');
+    const [joinMessage, setJoinMessage] = useState('');
 
     useEffect(() => {
         fetchOrganizations();
@@ -32,19 +43,37 @@ export default function OrganizationsScreen({ navigation }) {
 
     const handleCreateOrganization = async () => {
         if (orgName.trim() === '') {
-            setMessage('Organization name cannot be empty.');
+            setCreateMessage('Organization name cannot be empty.');
             return;
         }
         try {
             const response = await createOrganization(authData.email, orgName);
-            setMessage(response.message);
-            setIsModalVisible(false);
+            setCreateMessage(response.message);
+            setIsCreateModalVisible(false);
             setOrgName('');
             // Refresh the list of organizations
             fetchOrganizations();
         } catch (error) {
             console.error('Error creating organization:', error);
-            setMessage('Failed to create organization.');
+            setCreateMessage('Failed to create organization.');
+        }
+    };
+
+    const handleJoinOrganization = async () => {
+        if (inviteCode.trim() === '') {
+            setJoinMessage('Invite code cannot be empty.');
+            return;
+        }
+        try {
+            const response = await joinOrganization(authData.email, inviteCode);
+            setJoinMessage(response.message);
+            setIsJoinModalVisible(false);
+            setInviteCode('');
+            // Refresh the list of organizations
+            fetchOrganizations();
+        } catch (error) {
+            console.error('Error joining organization:', error);
+            setJoinMessage(error.message || 'Failed to join organization.');
         }
     };
 
@@ -62,14 +91,26 @@ export default function OrganizationsScreen({ navigation }) {
         <View style={styles.container}>
             <Text style={styles.title}>Organizations</Text>
 
-            {/* Create Organization Button */}
-            <TouchableOpacity
-                style={styles.createButton}
-                onPress={() => setIsModalVisible(true)}
-            >
-                <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Create Organization</Text>
-            </TouchableOpacity>
+            {/* Buttons Container */}
+            <View style={styles.buttonsContainer}>
+                {/* Create Organization Button */}
+                <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => setIsCreateModalVisible(true)}
+                >
+                    <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+                    <Text style={styles.buttonText}>Create Organization</Text>
+                </TouchableOpacity>
+
+                {/* Join Organization Button */}
+                <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => setIsJoinModalVisible(true)}
+                >
+                    <Ionicons name="log-in-outline" size={24} color="#FFFFFF" />
+                    <Text style={styles.buttonText}>Join Organization</Text>
+                </TouchableOpacity>
+            </View>
 
             <Text style={styles.sectionTitle}>Your Organizations</Text>
 
@@ -89,8 +130,8 @@ export default function OrganizationsScreen({ navigation }) {
             <Modal
                 animationType="slide"
                 transparent={true}
-                visible={isModalVisible}
-                onRequestClose={() => setIsModalVisible(false)}
+                visible={isCreateModalVisible}
+                onRequestClose={() => setIsCreateModalVisible(false)}
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
@@ -102,14 +143,17 @@ export default function OrganizationsScreen({ navigation }) {
                             value={orgName}
                             onChangeText={setOrgName}
                         />
-                        {message ? <Text style={styles.message}>{message}</Text> : null}
+                        {createMessage ? <Text style={styles.message}>{createMessage}</Text> : null}
                         <View style={styles.modalButtons}>
                             <TouchableOpacity style={styles.modalButton} onPress={handleCreateOrganization}>
                                 <Text style={styles.modalButtonText}>Create</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.cancelButton]}
-                                onPress={() => setIsModalVisible(false)}
+                                onPress={() => {
+                                    setIsCreateModalVisible(false);
+                                    setCreateMessage('');
+                                }}
                             >
                                 <Text style={styles.modalButtonText}>Cancel</Text>
                             </TouchableOpacity>
@@ -118,6 +162,41 @@ export default function OrganizationsScreen({ navigation }) {
                 </View>
             </Modal>
 
+            {/* Modal for Joining Organization */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isJoinModalVisible}
+                onRequestClose={() => setIsJoinModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Join an Organization</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Invite Code"
+                            placeholderTextColor="#bbb"
+                            value={inviteCode}
+                            onChangeText={setInviteCode}
+                        />
+                        {joinMessage ? <Text style={styles.message}>{joinMessage}</Text> : null}
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity style={styles.modalButton} onPress={handleJoinOrganization}>
+                                <Text style={styles.modalButtonText}>Join</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => {
+                                    setIsJoinModalVisible(false);
+                                    setJoinMessage('');
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -144,12 +223,18 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 10,
     },
-    createButton: {
+    buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: "#444",
         padding: 10,
         borderRadius: 8,
+        flex: 1,
+        marginRight: 10,
     },
     buttonText: {
         color: "#FFFFFF",
@@ -221,3 +306,4 @@ const styles = StyleSheet.create({
         backgroundColor: "#777",
     },
 });
+
