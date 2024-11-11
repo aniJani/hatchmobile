@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import SearchModal from "../components/searchModal"; // Import the SearchModal component
+import SearchModal from "../components/searchModal";
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 import { loadProjects } from "../services/projectServices";
@@ -95,6 +95,13 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
 
+      {/* Separate Invites button */}
+      <Button
+        title="View Invites"
+        onPress={() => navigation.navigate("InvitesScreen")}
+        color="#007AFF"
+      />
+
       {loading && <ActivityIndicator size="large" color="#0000ff" />}
 
       {!loading && authData && userData ? (
@@ -129,7 +136,6 @@ export default function DashboardScreen({ navigation }) {
         />
       )}
 
-      {/* Use SearchModal Component */}
       <SearchModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -143,43 +149,11 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  email: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  collaboratorsHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  card: {
-    padding: 15,
-    marginBottom: 10,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
+  email: { fontSize: 16, textAlign: "center", marginBottom: 10 },
+  sectionTitle: { fontSize: 20, fontWeight: "bold", marginTop: 20, marginBottom: 10 },
+  collaboratorsHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10, marginBottom: 10 },
+  card: { padding: 15, marginBottom: 10, backgroundColor: "#f9f9f9", borderRadius: 8 },
+  cardTitle: { fontSize: 18, fontWeight: "bold" },
 });

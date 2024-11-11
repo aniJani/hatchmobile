@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './contexts/auth'; // Adjust the path if n
 import ColabProfilePage from './screens/ColabProfilePage';
 import DashboardScreen from './screens/DashboardScreen';
 import InitProject from './screens/InitProject';
+import InvitesScreen from './screens/InvitesScreen';
 import MatchmakingScreen from './screens/MatchmakingScreen';
 import ProjectDetailScreen from './screens/ProjectDetail'; // Import ProjectDetailScreen
 import RegisterScreen from './screens/RegisterScreen';
@@ -72,6 +73,10 @@ const AppStack = () => (
       name="ProjectDetail"
       component={ProjectDetailScreen}
       options={{ headerShown: true, title: "Project Details" }}
+    />
+    <Stack.Screen
+      name="InvitesScreen"
+      component={InvitesScreen}
     />
     <Stack.Screen
       name="MatchmakingScreen"
