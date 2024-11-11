@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/auth";
 import { getUserByEmail, updateUser } from "../services/userServices";
 
 export default function UserProfileScreen() {
-  const { authData, loading } = useAuth();
+  const { authData, loading, signOut } = useAuth();
   const [skills, setSkills] = useState("");
   const [description, setDescription] = useState("");
   const [openToCollaboration, setOpenToCollaboration] = useState(false);
@@ -34,6 +34,10 @@ export default function UserProfileScreen() {
       console.error(`Failed to update ${field}:`, error);
       Alert.alert("Error", `Failed to update ${field}`);
     }
+  };
+
+  const handleLogout = () => {
+    signOut();
   };
 
   useEffect(() => {
@@ -81,6 +85,8 @@ export default function UserProfileScreen() {
           }}
         />
       </View>
+
+      <Button title="Log Out" onPress={handleLogout} />
     </View>
   );
 }
