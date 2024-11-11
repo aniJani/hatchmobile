@@ -2,7 +2,7 @@
 
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -23,29 +23,23 @@ export default function ChatModal({ visible, onClose, projectId }) {
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const pollingInterval = useRef(null); // Reference to the polling interval
 
     const BACKEND_URL = 'http://10.16.28.214:3000'; // Replace with your backend URL
 
-    // Fetch messages when the modal becomes visible
-    useEffect(() => {
-        if (visible) {
-            fetchMessages();
-        }
-    }, [visible]);
-
+    // Function to fetch messages
     const fetchMessages = async () => {
         try {
-            setLoading(true);
-            const response = await axios.get(`${BACKEND_URL}/chat/${projectId}`);
+            // Fetch only the latest 50 messages
+            const response = await axios.get(`${BACKEND_URL}/chat/${projectId}?limit=50`);
             setMessages(response.data);
         } catch (error) {
             console.error('Error fetching messages:', error);
             // Optionally, display an error message to the user
-        } finally {
-            setLoading(false);
         }
     };
 
+    // Function to send a new message
     const sendMessage = async () => {
         if (newMessage.trim() === '') return;
 
@@ -55,12 +49,9 @@ export default function ChatModal({ visible, onClose, projectId }) {
                 sender: authData.email, // Use authenticated user's email
                 content: newMessage.trim(),
             };
-            const response = await axios.post(
-                `${BACKEND_URL}/chat/${projectId}`,
-                messageData
-            );
-            setMessages(response.data);
+            await axios.post(`${BACKEND_URL}/chat/${projectId}`, messageData);
             setNewMessage('');
+            fetchMessages(); // Fetch messages immediately after sending
         } catch (error) {
             console.error('Error sending message:', error);
             // Optionally, display an error message to the user
@@ -68,6 +59,26 @@ export default function ChatModal({ visible, onClose, projectId }) {
             setSending(false);
         }
     };
+
+    // Set up polling when the modal is visible
+    useEffect(() => {
+        if (visible) {
+            setLoading(true);
+            fetchMessages().then(() => setLoading(false));
+
+            // Start polling every 10 seconds
+            pollingInterval.current = setInterval(() => {
+                fetchMessages();
+            }, 10000); // 10,000 milliseconds
+        }
+
+        // Clean up the polling interval when the modal is closed
+        return () => {
+            if (pollingInterval.current) {
+                clearInterval(pollingInterval.current);
+            }
+        };
+    }, [visible]);
 
     // Render each message
     const renderMessage = ({ item }) => {
@@ -113,6 +124,7 @@ export default function ChatModal({ visible, onClose, projectId }) {
                         style={styles.messagesContainer}
                         renderItem={renderMessage}
                         inverted={false} // Change to true if you want latest messages at the bottom
+                        contentContainerStyle={{ paddingBottom: 20 }}
                     />
                 )}
 
