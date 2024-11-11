@@ -1,16 +1,28 @@
 // components/SearchModal.js
-import React, { useState } from "react";
-import { ActivityIndicator, Button, FlatList, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Button, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-export default function SearchModal({ visible, onClose, onSearch, searchResults, isSearching }) {
+export default function SearchModal({ visible, onClose, onSearch, searchResults, isSearching, navigation }) {
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Reset the search query and results when the modal is closed
+    useEffect(() => {
+        if (!visible) {
+            setSearchQuery("");
+        }
+    }, [visible]);
 
     const handleSearch = () => {
         onSearch(searchQuery);
     };
 
+    const handleModalClose = () => {
+        setSearchQuery(""); // Clear the search query
+        onClose();          // Call the provided onClose function
+    };
+
     return (
-        <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
+        <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={handleModalClose}>
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Search Collaborators</Text>
@@ -29,17 +41,22 @@ export default function SearchModal({ visible, onClose, onSearch, searchResults,
                             data={searchResults}
                             keyExtractor={(item) => item._id.toString()}
                             renderItem={({ item }) => (
-                                <View style={styles.card}>
-                                    <Text style={styles.cardTitle}>{item.name}</Text>
-                                    <Text>Email: {item.email}</Text>
-                                    <Text>Description: {item.description}</Text>
-                                    <Text>Skills: {item.skills.join(", ")}</Text>
-                                </View>
+                                <TouchableOpacity onPress={() => {
+                                    navigation.navigate("ColabProfilePage", { collaborator: item });
+                                    handleModalClose(); // Close and reset modal when navigating
+                                }}>
+                                    <View style={styles.card}>
+                                        <Text style={styles.cardTitle}>{item.name}</Text>
+                                        <Text>Email: {item.email}</Text>
+                                        <Text>Description: {item.description}</Text>
+                                        <Text>Skills: {item.skills.join(", ")}</Text>
+                                    </View>
+                                </TouchableOpacity>
                             )}
                             ListEmptyComponent={<Text>No results found.</Text>}
                         />
                     )}
-                    <Button title="Close" onPress={onClose} />
+                    <Button title="Close" onPress={handleModalClose} />
                 </View>
             </View>
         </Modal>

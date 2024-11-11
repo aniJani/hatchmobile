@@ -136,6 +136,7 @@ export default function DashboardScreen({ navigation }) {
         onSearch={handleSearch}
         searchResults={searchResults}
         isSearching={isSearching}
+        navigation={navigation}
       />
     </View>
   );
