@@ -36,3 +36,12 @@ export const joinOrganization = async (email, inviteCode) => {
         throw error.response ? error.response.data : error;
     }
 }
+
+export const getOrganizationById = async (organizationId) => {
+    try {
+        const response = await axios.get(`http://${process.env.BASE_URL}/organizations/${organizationId}`);
+        return response.data.organization;
+    } catch (error) {
+        throw error.response ? error.response.data : error;
+    }
+};
