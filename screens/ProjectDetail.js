@@ -183,6 +183,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
         projectId={projectId}
         projectGoals={project.goals}
         projectCollaborators={project.collaborators}
+        navigation={navigation}
       />
 
       <CollaboratorSelectionModal

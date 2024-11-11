@@ -1,10 +1,10 @@
 // components/ProjectSearchModal.js
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, Modal, StyleSheet, Text, View } from "react-native";
+import { Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useAuth } from "../contexts/auth"; // Import useAuth to get the logged-in user ID
 import { findUserMatch } from "../services/matchFinder";
 
-export default function ProjectSearchModal({ visible, onClose, projectId, projectGoals, projectCollaborators }) {
+export default function ProjectSearchModal({ visible, onClose, projectId, projectGoals, projectCollaborators, navigation }) {
   const { authData } = useAuth(); // Access the logged-in user's data
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -12,6 +12,9 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
   useEffect(() => {
     if (visible) {
       handleSearchForMatches();
+    } else {
+      // Clear search results when the modal is closed
+      setSearchResults([]);
     }
   }, [visible]);
 
@@ -21,11 +24,8 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
     try {
       setIsSearching(true);
       const goalsQuery = projectGoals.map((goal) => `${goal.title} ${goal.description}`).join(" ");
-
-      // Fetch all matching users
       const results = await findUserMatch(goalsQuery, authData.userId);
 
-      // Filter out users already in the project's collaborators list
       const filteredResults = results.filter(
         (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
       );
@@ -51,11 +51,16 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
               data={searchResults}
               keyExtractor={(item) => item._id.toString()}
               renderItem={({ item }) => (
-                <View style={styles.resultItem}>
-                  <Text>{item.name}</Text>
-                  <Text>{item.email}</Text>
-                  <Text>{item.skills.join(", ")}</Text>
-                </View>
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate("ColabProfilePage", { collaborator: item });
+                  onClose(); // Close and reset modal on navigation
+                }}>
+                  <View style={styles.resultItem}>
+                    <Text>{item.name}</Text>
+                    <Text>{item.email}</Text>
+                    <Text>{item.skills.join(", ")}</Text>
+                  </View>
+                </TouchableOpacity>
               )}
               ListEmptyComponent={<Text>No results found.</Text>}
             />
