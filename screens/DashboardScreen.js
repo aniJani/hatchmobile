@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import SearchModal from "../components/searchModal"; // Import the SearchModal component
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
@@ -81,12 +81,14 @@ export default function DashboardScreen({ navigation }) {
   );
 
   const renderCollaborator = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.name}</Text>
-      <Text>Email: {item.email}</Text>
-      <Text>Description: {item.description}</Text>
-      <Text>Skills: {item.skills.join(", ")}</Text>
-    </View>
+    <TouchableOpacity onPress={() => navigation.navigate("ColabProfilePage", { collaborator: item })}>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text>Email: {item.email}</Text>
+        <Text>Description: {item.description}</Text>
+        <Text>Skills: {item.skills.join(", ")}</Text>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
