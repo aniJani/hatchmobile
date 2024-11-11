@@ -16,3 +16,13 @@ export const getInvitationsByInvitee = async (inviteeEmail) => {
         throw error;
     }
 };
+
+export const updateInvitationStatus = async (invitationId, status) => {
+    try {
+        const response = await axios.put(`http://${process.env.BASE_URL}/invites/${invitationId}/status`, { status });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating invitation status:", error);
+        throw error;
+    }
+};

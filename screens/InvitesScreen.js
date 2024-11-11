@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
+    Alert,
     FlatList,
     Modal,
     ScrollView,
@@ -10,8 +11,8 @@ import {
     View,
 } from "react-native";
 import { useAuth } from "../contexts/auth";
-import { getInvitationsByInvitee } from "../services/invitationServices";
-import { getProjectById } from '../services/projectServices';
+import { getInvitationsByInvitee, updateInvitationStatus } from "../services/invitationServices";
+import { editProjectById, getProjectById } from '../services/projectServices';
 
 export default function InvitesScreen() {
     const { authData } = useAuth();
@@ -19,6 +20,7 @@ export default function InvitesScreen() {
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedInvitationId, setSelectedInvitationId] = useState(null);
     const [projectLoading, setProjectLoading] = useState(false);
 
     useEffect(() => {
@@ -37,11 +39,12 @@ export default function InvitesScreen() {
         }
     };
 
-    const handleInvitationPress = async (projectId) => {
+    const handleInvitationPress = async (invitation) => {
         try {
             setProjectLoading(true);
             setModalVisible(true);
-            const projectData = await getProjectById(projectId);
+            setSelectedInvitationId(invitation._id); // Set the selected invitation ID
+            const projectData = await getProjectById(invitation.projectId._id);
             setSelectedProject(projectData);
         } catch (error) {
             console.error("Error fetching project details:", error);
@@ -50,9 +53,65 @@ export default function InvitesScreen() {
         }
     };
 
+    const handleAcceptInvitation = async () => {
+        try {
+            // Update the invitation status to 'accepted'
+            await updateInvitationStatus(selectedInvitationId, 'accepted');
+
+            // Extract existing collaborator emails (excluding the owner)
+            const existingCollaboratorEmails = selectedProject.collaborators
+                .filter(collab => collab.role !== 'owner')
+                .map(collab => collab.email);
+
+            // Add the new collaborator email
+            const collaboratorEmails = [...existingCollaboratorEmails, authData.email];
+
+            // Prepare updated project data
+            const updatedProject = {
+                projectName: selectedProject.projectName,
+                description: selectedProject.description,
+                goals: selectedProject.goals,
+                collaboratorEmails: collaboratorEmails,
+            };
+
+            // Use editProjectById to update the project
+            await editProjectById(selectedProject._id, updatedProject);
+
+            Alert.alert('Success', 'You have accepted the invitation and been added to the project.');
+
+            // Refresh the invitations list
+            fetchInvitations();
+            setModalVisible(false);
+            setSelectedProject(null);
+            setSelectedInvitationId(null);
+        } catch (error) {
+            console.error("Error accepting invitation:", error);
+            Alert.alert('Error', 'Failed to accept the invitation.');
+        }
+    };
+
+
+    const handleDeclineInvitation = async () => {
+        try {
+            // Update the invitation status to 'declined'
+            await updateInvitationStatus(selectedInvitationId, 'declined');
+
+            Alert.alert('Invitation Declined', 'You have declined the invitation.');
+
+            // Refresh the invitations list
+            fetchInvitations();
+            setModalVisible(false);
+            setSelectedProject(null);
+            setSelectedInvitationId(null);
+        } catch (error) {
+            console.error("Error declining invitation:", error);
+            Alert.alert('Error', 'Failed to decline the invitation.');
+        }
+    };
+
     const renderInvitation = ({ item }) => (
         <TouchableOpacity
-            onPress={() => handleInvitationPress(item.projectId._id)}
+            onPress={() => handleInvitationPress(item)}
         >
             <View style={styles.card}>
                 <Text style={styles.cardTitle}>Project: {item.projectId.projectName}</Text>
@@ -81,6 +140,7 @@ export default function InvitesScreen() {
                 onRequestClose={() => {
                     setModalVisible(false);
                     setSelectedProject(null);
+                    setSelectedInvitationId(null);
                 }}
             >
                 <View style={styles.modalBackground}>
@@ -110,9 +170,24 @@ export default function InvitesScreen() {
                                 </ScrollView>
 
                                 <TouchableOpacity
+                                    onPress={handleAcceptInvitation}
+                                    style={styles.acceptButton}
+                                >
+                                    <Text style={styles.acceptButtonText}>Accept</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={handleDeclineInvitation}
+                                    style={styles.declineButton}
+                                >
+                                    <Text style={styles.declineButtonText}>Decline</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
                                     onPress={() => {
                                         setModalVisible(false);
                                         setSelectedProject(null);
+                                        setSelectedInvitationId(null);
                                     }}
                                     style={styles.closeButton}
                                 >
@@ -181,5 +256,29 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    acceptButton: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: 'green',
+        borderRadius: 5,
+        width: '100%',
+    },
+    acceptButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    declineButton: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: 'red',
+        borderRadius: 5,
+        width: '100%',
+    },
+    declineButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
