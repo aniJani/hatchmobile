@@ -1,11 +1,10 @@
-// components/ProjectSearchModal.js
 import React, { useEffect, useState } from "react";
 import { Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useAuth } from "../contexts/auth"; // Import useAuth to get the logged-in user ID
+import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 
 export default function ProjectSearchModal({ visible, onClose, projectId, projectGoals, projectCollaborators, navigation }) {
-  const { authData } = useAuth(); // Access the logged-in user's data
+  const { authData } = useAuth();
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -13,7 +12,6 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
     if (visible) {
       handleSearchForMatches();
     } else {
-      // Clear search results when the modal is closed
       setSearchResults([]);
     }
   }, [visible]);
@@ -45,7 +43,7 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
           <Text style={styles.modalTitle}>Suggested Collaborators</Text>
 
           {isSearching ? (
-            <Text>Loading...</Text>
+            <Text style={styles.whiteText}>Loading...</Text>
           ) : (
             <FlatList
               data={searchResults}
@@ -53,19 +51,21 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => {
                   navigation.navigate("ColabProfilePage", { collaborator: item });
-                  onClose(); // Close and reset modal on navigation
+                  onClose();
                 }}>
                   <View style={styles.resultItem}>
-                    <Text>{item.name}</Text>
-                    <Text>{item.email}</Text>
-                    <Text>{item.skills.join(", ")}</Text>
+                    <Text style={styles.whiteText}>{item.name}</Text>
+                    <Text style={styles.whiteText}>{item.email}</Text>
+                    <Text style={styles.whiteText}>{item.skills.join(", ")}</Text>
                   </View>
                 </TouchableOpacity>
               )}
-              ListEmptyComponent={<Text>No results found.</Text>}
+              ListEmptyComponent={<Text style={styles.whiteText}>No results found.</Text>}
             />
           )}
-          <Button title="Close" onPress={onClose} />
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "80%",
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#272222", // Dark background color
     borderRadius: 10,
   },
   modalTitle: {
@@ -90,10 +90,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
+    color: "#fff", // White text color
   },
   resultItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#444", // Darker border color to match the theme
+  },
+  whiteText: {
+    color: "#fff", // White text color
+  },
+  closeButton: {
+    marginTop: 15,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff", // White text color
+    fontWeight: "bold",
   },
 });

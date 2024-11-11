@@ -1,5 +1,3 @@
-// components/CollaboratorSelectionModal.js
-
 import React, { useEffect, useState } from "react";
 import {
     Button,
@@ -37,10 +35,8 @@ export default function CollaboratorSelectionModal({
             if (scope === "internal") {
                 results = projectCollaborators;
             } else {
-                // Check if goalDescription is available for the external scope
                 if (goalDescription) {
                     results = await findUserMatch(goalDescription);
-                    // Exclude existing project collaborators
                     results = results.filter(
                         (user) =>
                             !projectCollaborators.some(
@@ -61,11 +57,9 @@ export default function CollaboratorSelectionModal({
 
     const handleCollaboratorSelect = (item) => {
         if (scope === "internal") {
-            // Directly assign the collaborator
             onSelectCollaborator(item.email);
             onClose();
         } else {
-            // Navigate to ColabProfilePage (existing logic)
             navigation.navigate("ColabProfilePage", { collaborator: item });
             onClose();
         }
@@ -105,7 +99,7 @@ export default function CollaboratorSelectionModal({
                     </View>
 
                     {isFetching ? (
-                        <Text>Loading collaborators...</Text>
+                        <Text style={styles.whiteText}>Loading collaborators...</Text>
                     ) : (
                         <FlatList
                             data={collaborators}
@@ -115,15 +109,17 @@ export default function CollaboratorSelectionModal({
                                     onPress={() => handleCollaboratorSelect(item)}
                                 >
                                     <View style={styles.collaboratorItem}>
-                                        <Text>{item.name || "Collaborator"}</Text>
-                                        <Text>{item.email}</Text>
+                                        <Text style={styles.whiteText}>{item.name || "Collaborator"}</Text>
+                                        <Text style={styles.whiteText}>{item.email}</Text>
                                     </View>
                                 </TouchableOpacity>
                             )}
-                            ListEmptyComponent={<Text>No collaborators found.</Text>}
+                            ListEmptyComponent={
+                                <Text style={styles.whiteText}>No collaborators found.</Text>
+                            }
                         />
                     )}
-                    <Button title="Close" onPress={onClose} />
+                    <Button title="Close" onPress={onClose} color="#fff" />
                 </View>
             </View>
         </Modal>
@@ -138,14 +134,15 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
     modalContent: {
+        backgroundColor: "#272222",
         width: "80%",
         maxHeight: "80%",
         padding: 20,
-        backgroundColor: "#fff",
         borderRadius: 10,
     },
     modalTitle: {
-        fontSize: 20,
+        fontSize: 16,
+        color: "#fff",
         fontWeight: "bold",
         textAlign: "center",
         marginBottom: 10,
@@ -157,16 +154,19 @@ const styles = StyleSheet.create({
     },
     scopeText: {
         fontSize: 16,
-        color: "#2196F3",
+        color: "#fff", // White text color
     },
     activeScope: {
-        fontWeight: "bold",
-        color: "#000",
+        fontWeight: "bold", // Bold text to indicate selection
+        color: "#fff", // White text color
     },
     collaboratorItem: {
         padding: 10,
         borderBottomWidth: 1,
-        borderBottomColor: "#ddd",
+        borderBottomColor: "#444",
         textAlign: "center",
+    },
+    whiteText: {
+        color: "#fff", // White text color
     },
 });

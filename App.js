@@ -82,7 +82,7 @@ const AppStack = () => (
     <Stack.Screen
       name="ProjectDetail"
       component={ProjectDetailScreen}
-      options={{ headerShown: true, title: "Project Details" }}
+      options={{ headerShown: false, title: "Project Details" }}
     />
     <Stack.Screen
       name="InvitesScreen"
@@ -91,7 +91,7 @@ const AppStack = () => (
     <Stack.Screen
       name="MatchmakingScreen"
       component={MatchmakingScreen}
-      options={{ headerShown: true, title: "Matchmaking Screen" }}
+      options={{ headerShown: false, title: "Matchmaking Screen" }}
     />
     <Stack.Screen
       name="ColabProfilePage"

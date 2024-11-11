@@ -1,15 +1,16 @@
+import React, { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Button,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
+  Button,
 } from "react-native";
 import CollaboratorSelectionModal from "../components/CollaboratorSelectionModal";
 import ProjectSearchModal from "../components/ProjectSearchModal";
@@ -20,10 +21,10 @@ export default function ProjectDetailScreen({ route, navigation }) {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isProjectSearchModalVisible, setIsProjectSearchModalVisible] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [updatedProject, setUpdatedProject] = useState({});
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [selectedGoalIndex, setSelectedGoalIndex] = useState(null);
+  const [editableGoalIndex, setEditableGoalIndex] = useState(null); // New state
 
   useEffect(() => {
     fetchProjectDetails();
@@ -46,7 +47,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
     try {
       await editProjectById(projectId, updatedProject);
       Alert.alert("Success", "Project updated successfully");
-      setEditMode(false);
+      setEditableGoalIndex(null);
       fetchProjectDetails();
     } catch (error) {
       console.error("Error updating project:", error);
@@ -54,17 +55,10 @@ export default function ProjectDetailScreen({ route, navigation }) {
     }
   };
 
-  const handleInputChange = (field, value, index = null) => {
-    if (index !== null) {
-      const newGoals = [...updatedProject.goals];
-      newGoals[index][field] = value;
-      setUpdatedProject({ ...updatedProject, goals: newGoals });
-    } else {
-      setUpdatedProject((prevState) => ({
-        ...prevState,
-        [field]: value,
-      }));
-    }
+  const handleInputChange = (field, value, index) => {
+    const newGoals = [...updatedProject.goals];
+    newGoals[index][field] = value;
+    setUpdatedProject({ ...updatedProject, goals: newGoals });
   };
 
   const openAssignCollaboratorModal = (index) => {
@@ -85,7 +79,7 @@ export default function ProjectDetailScreen({ route, navigation }) {
 
   if (!project) {
     return (
-      <View style={styles.container}>
+      <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Failed to load project details.</Text>
       </View>
     );
@@ -93,88 +87,143 @@ export default function ProjectDetailScreen({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.projectTitleContainer}>
-        {editMode ? (
-          <TextInput
-            style={styles.input}
-            placeholder="Project Name"
-            value={updatedProject.projectName}
-            onChangeText={(text) => handleInputChange("projectName", text)}
-          />
-        ) : (
-          <Text style={styles.title}>{project.projectName}</Text>
-        )}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
+          <MaterialIcons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setIsProjectSearchModalVisible(true)}
+        >
+          <MaterialIcons name="explore" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
 
-      {editMode ? (
-        <TextInput
-          style={styles.input}
-          placeholder="Description"
-          multiline
-          value={updatedProject.description}
-          onChangeText={(text) => handleInputChange("description", text)}
-        />
-      ) : (
-        <Text style={styles.description}>{project.description}</Text>
-      )}
+      <View style={styles.projectTitleContainer}>
+        <Text style={styles.title}>{project.projectName}</Text>
+      </View>
 
-      <Button title="Find Suggested Collaborators" onPress={() => setIsProjectSearchModalVisible(true)} />
+      <Text style={styles.description}>{project.description}</Text>
 
       <Text style={styles.sectionTitle}>Goals:</Text>
       {Array.isArray(updatedProject.goals) && updatedProject.goals.length > 0 ? (
         updatedProject.goals.map((goal, index) => (
-          <View key={index} style={styles.goalItem}>
-            {editMode ? (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Goal Title"
-                  value={goal.title}
-                  onChangeText={(text) => handleInputChange("title", text, index)}
-                />
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder="Goal Description"
-                  multiline
-                  value={goal.description}
-                  onChangeText={(text) => handleInputChange("description", text, index)}
-                />
+        <TouchableOpacity
+          key={index}
+          style={[
+            styles.goalCard,
+            {
+              borderColor:
+                goal.status === "not started"
+                  ? "#ff4d4d"
+                  : goal.status === "in progress"
+                  ? "#ffa500"
+                  : "#28a745",
+            },
+          ]}
+          onPress={() => setEditableGoalIndex(index)}
+        >
+          {editableGoalIndex === index ? (
+            <>
 
-                <Text style={styles.goalSectionLabel}>Status:</Text>
-                <Picker
-                  selectedValue={goal.status}
-                  style={styles.picker}
-                  onValueChange={(itemValue) => handleInputChange("status", itemValue, index)}
+              <View style={styles.assignContainer}>
+              <TouchableOpacity onPress={() => setEditableGoalIndex(null)}>
+                  <MaterialIcons name="cancel" size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleSaveChanges}>
+                  <MaterialIcons name="check" size={24} color="#fff" />
+                </TouchableOpacity>
+
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Goal Title"
+                value={goal.title}
+                onChangeText={(text) => handleInputChange("title", text, index)}
+                placeholderTextColor="#bbb"
+              />
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Goal Description"
+                multiline
+                value={goal.description}
+                onChangeText={(text) => handleInputChange("description", text, index)}
+                placeholderTextColor="#bbb"
+              />
+
+              <View style={styles.statusButtonsContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.statusButton,
+                    { borderColor: goal.status === "not started" ? "#ff4d4d" : "#ccc" },
+                  ]}
+                  onPress={() => handleInputChange("status", "not started", index)}
                 >
-                  <Picker.Item label="Not Started" value="not started" />
-                  <Picker.Item label="In Progress" value="in progress" />
-                  <Picker.Item label="Completed" value="completed" />
-                </Picker>
+                  <Text style={styles.statusButtonText}>Not Started</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.statusButton,
+                    { borderColor: goal.status === "in progress" ? "#ffa500" : "#ccc" },
+                  ]}
+                  onPress={() => handleInputChange("status", "in progress", index)}
+                >
+                  <Text style={styles.statusButtonText}>In Progress</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.statusButton,
+                    { borderColor: goal.status === "completed" ? "#28a745" : "#ccc" },
+                  ]}
+                  onPress={() => handleInputChange("status", "completed", index)}
+                >
+                  <Text style={styles.statusButtonText}>Completed</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.assignContainer}>
 
                 <Text style={styles.goalSectionLabel}>Assigned To:</Text>
-                <Button title="Assign Collaborator" onPress={() => openAssignCollaboratorModal(index)} />
+                <Text style={styles.goalDescription}>{goal.assignedTo}</Text>
+                
+                <TouchableOpacity
+                  style={styles.assignButton}
+                  onPress={() => openAssignCollaboratorModal(index)}
+                >
+                  <MaterialIcons name="add" size={24} color="#fff" />
+                  
+                </TouchableOpacity>
 
-                <Text style={styles.goalSectionLabel}>Estimated Time:</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Estimated Time"
-                  value={goal.estimatedTime}
-                  onChangeText={(text) => handleInputChange("estimatedTime", text, index)}
-                />
-              </>
-            ) : (
-              <>
-                <Text style={styles.goalTitle}>{goal.title}</Text>
-                <Text style={styles.goalDescription}>{goal.description}</Text>
-                <Text>Status: {goal.status}</Text>
-                <Text>Assigned to: {goal.assignedTo}</Text>
-                <Text>Estimated Time: {goal.estimatedTime}</Text>
-              </>
-            )}
-          </View>
+              </View>
+
+
+
+              <Text style={styles.goalSectionLabel}>Estimated Time:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Estimated Time"
+                value={goal.estimatedTime}
+                onChangeText={(text) => handleInputChange("estimatedTime", text, index)}
+                placeholderTextColor="#bbb"
+              />
+
+
+            </>
+          ) : (
+            <>
+              <Text style={styles.goalTitle}>{goal.title}</Text>
+              <Text style={styles.goalDescription}>{goal.description}</Text>
+              <Text style={styles.goalDescription}>Assigned to: {goal.assignedTo}</Text>
+              <Text style={styles.goalDescription}>Estimated Time: {goal.estimatedTime}</Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+
+
         ))
       ) : (
-        <Text>No goals specified.</Text>
+        <Text style={styles.noGoalsText}>No goals specified.</Text>
       )}
 
       <ProjectSearchModal
@@ -194,19 +243,6 @@ export default function ProjectDetailScreen({ route, navigation }) {
         navigation={navigation}
         onSelectCollaborator={assignCollaboratorToGoal}
       />
-
-      <View style={styles.buttonContainer}>
-        {editMode ? (
-          <>
-            <Button title="Save Changes" onPress={handleSaveChanges} />
-            <Button title="Cancel" onPress={() => setEditMode(false)} color="red" />
-          </>
-        ) : (
-          <Button title="Edit Project" onPress={() => setEditMode(true)} />
-        )}
-      </View>
-
-      <Button title="Go Back" onPress={() => navigation.goBack()} />
     </ScrollView>
   );
 }
@@ -215,52 +251,76 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#272222",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 25,
+    marginBottom: 15,
   },
   projectTitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 10,
   },
+  statusButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  statusButton: {
+    flex: 1,
+    padding: 5,
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  statusButtonText: {
+    color: "#fff",
+  },
+  
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#FFFFFF",
   },
   description: {
     fontSize: 16,
-    textAlign: "center",
+    color: "rgba(255, 255, 255, 0.5)",
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 18,
     marginTop: 20,
     marginBottom: 10,
+    color: "#FFFFFF",
   },
-  goalItem: {
-    marginBottom: 15,
+  goalCard: {
+    borderRadius: 10,
     padding: 15,
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    marginBottom: 15,
+    borderWidth: 1, // Add border width
   },
+  
   goalTitle: {
-    fontWeight: "bold",
     fontSize: 16,
-    marginBottom: 5,
+    color: "#FFFFFF",
+    marginVertical: 5,
   },
   goalDescription: {
     fontSize: 14,
+    color: "rgba(255, 255, 255, 0.5)",
     marginBottom: 10,
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
-    marginVertical: 5,
     borderRadius: 5,
+    marginVertical: 5,
+    color: '#fff'
   },
   textArea: {
     height: 80,
@@ -274,43 +334,48 @@ const styles = StyleSheet.create({
   goalSectionLabel: {
     fontWeight: "bold",
     marginTop: 10,
+    color: "rgba(255, 255, 255, 0.5)",
   },
-  buttonContainer: {
-    marginTop: 20,
+  assignButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 5,
   },
-  modalContainer: {
+  noGoalsText: {
+    fontSize: 14,
+    color: "#777",
+  },
+  saveButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  goBackButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  assignContainer:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    alignContent: "center"
+  },
+  errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  searchScopeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 10,
-  },
-  searchScopeText: {
-    fontSize: 16,
-    color: "#2196F3",
-  },
-  collaboratorItem: {
-    padding: 10,
-    fontSize: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    textAlign: "center",
   },
   errorText: {
     fontSize: 16,
