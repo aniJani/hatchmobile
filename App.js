@@ -66,7 +66,7 @@ const AppTabs = () => (
 
 // AuthStack: Screens for authentication
 const AuthStack = () => (
-  <Stack.Navigator initialRouteName="Register">
+  <Stack.Navigator initialRouteName="Register" screenOptions={{ headerShown: false }}>
     <Stack.Screen name="SignIn" component={SignInScreen} />
     <Stack.Screen name="Register" component={RegisterScreen} />
   </Stack.Navigator>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons
 import { useAuth } from "../contexts/auth";
 import { createTaskDivision, saveProjectToDatabase } from "../services/goalDivision";
 
@@ -70,7 +71,8 @@ export default function InitProject({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button title="Done" onPress={handleSaveTasks} style={styles.doneButton} />
+
+
       <Text style={styles.title}>Project Task Generator</Text>
       <TextInput
         style={styles.input}
@@ -85,7 +87,23 @@ export default function InitProject({ navigation }) {
         value={projectDescription}
         onChangeText={(text) => setProjectDescription(text)}
       />
-      <Button title="Generate Tasks" onPress={handleGenerateTasks} disabled={loading} />
+
+      <View style={styles.buttonContainer}>
+        
+        <TouchableOpacity
+          onPress={handleGenerateTasks}
+          style={[styles.generateButton, styles.button]}
+          disabled={loading}
+        >
+          <MaterialIcons name="autorenew" size={24} color="#fff" />
+          <Text style={styles.buttonText}>Generate Tasks</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleSaveTasks} style={[styles.doneButton, styles.button]}>
+          <MaterialIcons name="done" size={24} color="#fff" />
+          <Text style={styles.buttonText}>Done</Text>
+        </TouchableOpacity>
+      </View>
 
       {loading ? (
         <Text style={styles.loadingText}>Generating tasks...</Text>
@@ -119,13 +137,22 @@ export default function InitProject({ navigation }) {
                         value={editedTask.estimatedTime}
                         onChangeText={(text) => setEditedTask({ ...editedTask, estimatedTime: text })}
                       />
-                      <Button title="Save" onPress={saveEditedTask} />
+                      <TouchableOpacity onPress={saveEditedTask} style={[styles.saveButton, styles.button]}>
+                        <MaterialIcons name="save" size={24} color="#fff" />
+                        <Text style={styles.buttonText}>Save</Text>
+                      </TouchableOpacity>
                     </>
                   ) : (
                     <>
                       <Text style={styles.taskDescription}>{task.description}</Text>
                       <Text style={styles.taskTime}>{`Estimated Time: ${task.estimatedTime}`}</Text>
-                      <Button title="Edit" onPress={() => startEditing(index)} />
+                      <TouchableOpacity
+                        onPress={() => startEditing(index)}
+                        style={[styles.editButton, styles.button]}
+                      >
+                        <MaterialIcons name="edit" size={24} color="#fff" />
+                        <Text style={styles.buttonText}>Edit</Text>
+                      </TouchableOpacity>
                     </>
                   )}
                 </View>
@@ -142,13 +169,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#272222",
+    paddingBottom: 85,
+    paddingTop: 45
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
+    color: "#fff",
   },
   input: {
     borderWidth: 1,
@@ -157,11 +187,14 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     textAlignVertical: "top",
+    color: "#fff",
+    backgroundColor: "#333",
   },
   loadingText: {
     textAlign: "center",
     marginTop: 10,
     fontSize: 16,
+    color: "#fff",
   },
   taskList: {
     marginTop: 20,
@@ -169,12 +202,13 @@ const styles = StyleSheet.create({
   taskCard: {
     padding: 15,
     marginBottom: 10,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 8,
   },
   taskTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#fff",
   },
   taskDetails: {
     marginTop: 10,
@@ -182,11 +216,12 @@ const styles = StyleSheet.create({
   taskDescription: {
     fontSize: 16,
     marginTop: 5,
+    color: "#fff",
   },
   taskTime: {
     fontSize: 14,
     marginTop: 5,
-    color: "#666",
+    color: "#ccc",
   },
   editInput: {
     borderWidth: 1,
@@ -194,8 +229,35 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     marginBottom: 10,
+    color: "#fff",
+    backgroundColor: "#333",
   },
-  doneButton: {
-    marginTop: 20,
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
+    width: "48%", // Set a fixed width for buttons
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    marginLeft: 5,
+  },
+  generateButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+  },
+  saveButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+  },
+  editButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
 });
