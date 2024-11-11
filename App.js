@@ -43,7 +43,7 @@ const AppTabs = () => (
         bottom: 10,
         left: 10,
         right: 10,
-        backgroundColor: '#1640D6', // Blue background
+        backgroundColor: "rgba(255, 255, 255, 0.05)", // Blue background
         borderRadius: 30,
         height: 60,
         margin: 10,

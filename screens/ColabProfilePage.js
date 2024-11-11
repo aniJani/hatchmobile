@@ -1,6 +1,7 @@
 // screens/ColabProfilePage.js
 import React, { useEffect, useState } from "react";
-import { Alert, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons for button icons
 import { useAuth } from "../contexts/auth"; // Import auth context
 import { sendInvitation } from "../services/invitationServices";
 import { loadProjects } from "../services/projectServices"; // Use loadProjects to fetch owned projects
@@ -48,8 +49,8 @@ export default function ColabProfilePage({ route, navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.name}>{collaborator.name}</Text>
-            <Text>Email: {collaborator.email}</Text>
-            <Text>Skills: {collaborator.skills.join(", ")}</Text>
+            <Text style={styles.text}>Email: {collaborator.email}</Text>
+            <Text style={styles.text}>Skills: {collaborator.skills.join(", ")}</Text>
 
             <Text style={styles.sectionTitle}>Select a project to send an invite:</Text>
             <FlatList
@@ -57,7 +58,10 @@ export default function ColabProfilePage({ route, navigation }) {
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => setSelectedProject(item)}>
-                        <Text style={styles.projectName}>{item.projectName}</Text>
+                        <View style={styles.projectCard}>
+                            <Text style={styles.projectName}>{item.projectName}</Text>
+                            <Text style={styles.projectDescription}>{item.description}</Text>
+                        </View>
                     </TouchableOpacity>
                 )}
             />
@@ -65,9 +69,16 @@ export default function ColabProfilePage({ route, navigation }) {
             {selectedProject && (
                 <View style={styles.projectDetails}>
                     <Text style={styles.projectDetailsTitle}>Selected Project Details</Text>
-                    <Text>Name: {selectedProject.projectName}</Text>
-                    <Text>Description: {selectedProject.description}</Text>
-                    <Button title="Send Invite" onPress={handleInvite} />
+                    <Text style={styles.text}>Name: {selectedProject.projectName}</Text>
+                    <Text style={styles.text}>Description: {selectedProject.description}</Text>
+
+                    <TouchableOpacity
+                        onPress={handleInvite}
+                        style={styles.inviteButton}
+                    >
+                        <MaterialIcons name="send" size={20} color="#fff" />
+                        <Text style={styles.inviteButtonText}>Send Invite</Text>
+                    </TouchableOpacity>
                 </View>
             )}
         </View>
@@ -75,10 +86,45 @@ export default function ColabProfilePage({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
-    name: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
-    sectionTitle: { fontSize: 18, fontWeight: "bold", marginTop: 20 },
-    projectName: { fontSize: 16, color: "blue", marginVertical: 5 },
-    projectDetails: { marginTop: 20, padding: 10, backgroundColor: "#f0f0f0", borderRadius: 8 },
-    projectDetailsTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 5 },
+    container: { flex: 1, padding: 20, paddingTop: 45, backgroundColor: "#272222" },
+    name: { fontSize: 24, fontWeight: "bold", marginBottom: 10, color: "#fff" },
+    text: { fontSize: 16, color: "rgba(255, 255, 255, 0.7)", marginBottom: 5 },
+    sectionTitle: { fontSize: 18, fontWeight: "bold", marginTop: 20, marginBottom: 10, color: "#fff" },
+    
+    projectCard: {
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        borderRadius: 8,
+        padding: 15,
+        marginVertical: 8,
+    },
+    projectName: { fontSize: 18, fontWeight: "bold", color: "#fff" },
+    projectDescription: { fontSize: 14, color: "rgba(255, 255, 255, 0.7)", marginTop: 5 },
+
+    projectDetails: {
+        marginTop: 20,
+        padding: 15,
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        borderRadius: 8,
+    },
+    projectDetailsTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 10,
+        color: "#fff",
+    },
+
+    inviteButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 10,
+        backgroundColor: "#2196F3",
+        borderRadius: 5,
+        marginTop: 15,
+    },
+    inviteButtonText: {
+        color: "#fff",
+        fontWeight: "bold",
+        marginLeft: 5,
+    },
 });

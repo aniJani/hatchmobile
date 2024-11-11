@@ -90,7 +90,6 @@ export default function InvitesScreen() {
         }
     };
 
-
     const handleDeclineInvitation = async () => {
         try {
             // Update the invitation status to 'declined'
@@ -110,13 +109,11 @@ export default function InvitesScreen() {
     };
 
     const renderInvitation = ({ item }) => (
-        <TouchableOpacity
-            onPress={() => handleInvitationPress(item)}
-        >
+        <TouchableOpacity onPress={() => handleInvitationPress(item)}>
             <View style={styles.card}>
                 <Text style={styles.cardTitle}>Project: {item.projectId.projectName}</Text>
-                <Text>Invited by: {item.inviterEmail}</Text>
-                <Text>Status: {item.status}</Text>
+                <Text style={styles.cardText}>Invited by: {item.inviterEmail}</Text>
+                <Text style={styles.cardText}>Status: {item.status}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -125,7 +122,7 @@ export default function InvitesScreen() {
         <View style={styles.container}>
             <Text style={styles.title}>Your Invites</Text>
             {loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="#fff" />
             ) : (
                 <FlatList
                     data={invitations}
@@ -133,6 +130,7 @@ export default function InvitesScreen() {
                     renderItem={renderInvitation}
                 />
             )}
+
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -146,7 +144,7 @@ export default function InvitesScreen() {
                 <View style={styles.modalBackground}>
                     <View style={styles.modalContainer}>
                         {projectLoading ? (
-                            <ActivityIndicator size="large" color="#0000ff" />
+                            <ActivityIndicator size="large" color="#fff" />
                         ) : selectedProject ? (
                             <>
                                 <ScrollView style={{ maxHeight: '80%', width: '100%' }}>
@@ -158,44 +156,36 @@ export default function InvitesScreen() {
                                         selectedProject.goals.map((goal, index) => (
                                             <View key={index} style={styles.goalContainer}>
                                                 <Text style={styles.goalTitle}>{goal.title}</Text>
-                                                <Text>Assigned To: {goal.assignedTo || 'Unassigned'}</Text>
-                                                <Text>Status: {goal.status || 'Not Started'}</Text>
-                                                <Text>Estimated Time: {goal.estimatedTime || 'N/A'}</Text>
-                                                <Text>Description: {goal.description || 'No Description'}</Text>
+                                                <Text style={styles.cardText}>Assigned To: {goal.assignedTo || 'Unassigned'}</Text>
+                                                <Text style={styles.cardText}>Status: {goal.status || 'Not Started'}</Text>
+                                                <Text style={styles.cardText}>Estimated Time: {goal.estimatedTime || 'N/A'}</Text>
+                                                <Text style={styles.cardText}>Description: {goal.description || 'No Description'}</Text>
                                             </View>
                                         ))
                                     ) : (
-                                        <Text>No goals available for this project.</Text>
+                                        <Text style={styles.cardText}>No goals available for this project.</Text>
                                     )}
                                 </ScrollView>
 
-                                <TouchableOpacity
-                                    onPress={handleAcceptInvitation}
-                                    style={styles.acceptButton}
-                                >
-                                    <Text style={styles.acceptButtonText}>Accept</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    onPress={handleDeclineInvitation}
-                                    style={styles.declineButton}
-                                >
-                                    <Text style={styles.declineButtonText}>Decline</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                    onPress={() => {
+                                <View style={styles.buttonRow}>
+                                    <TouchableOpacity onPress={handleAcceptInvitation} style={styles.acceptButton}>
+                                        <Text style={styles.buttonText}>Accept</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={handleDeclineInvitation} style={styles.declineButton}>
+                                        <Text style={styles.buttonText}>Decline</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => {
                                         setModalVisible(false);
                                         setSelectedProject(null);
                                         setSelectedInvitationId(null);
-                                    }}
-                                    style={styles.closeButton}
-                                >
-                                    <Text style={styles.closeButtonText}>Close</Text>
-                                </TouchableOpacity>
+                                    }} style={styles.closeButton}>
+                                        <Text style={styles.buttonText}>Close</Text>
+                                    </TouchableOpacity>
+                                </View>
+
                             </>
                         ) : (
-                            <Text>Project not found.</Text>
+                            <Text style={styles.cardText}>Project not found.</Text>
                         )}
                     </View>
                 </View>
@@ -205,10 +195,11 @@ export default function InvitesScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-    title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
-    card: { padding: 15, marginBottom: 10, backgroundColor: "#f9f9f9", borderRadius: 8 },
-    cardTitle: { fontSize: 18, fontWeight: "bold" },
+    container: { flex: 1, padding: 20, paddingTop: 25, backgroundColor: "#272222" },
+    title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20, color: "#fff" },
+    card: { padding: 15, marginBottom: 10, backgroundColor: "#444", borderRadius: 8 },
+    cardTitle: { fontSize: 18, fontWeight: "bold", color: "#fff" },
+    cardText: { color: "rgba(255, 255, 255, 0.7)" },
     modalBackground: {
         flex: 1,
         justifyContent: 'center',
@@ -217,7 +208,8 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '90%',
-        backgroundColor: '#fff',
+        height: '90%',
+        backgroundColor: '#272222', // Dark background for modal
         borderRadius: 10,
         padding: 20,
         alignItems: 'center',
@@ -226,9 +218,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: "#fff",
     },
     modalDescription: {
         fontSize: 16,
+        color: "#fff",
         marginBottom: 10,
     },
     sectionTitle: {
@@ -236,49 +230,46 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 15,
         marginBottom: 5,
+        color: "#fff",
     },
     goalContainer: {
         marginBottom: 10,
         padding: 10,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#333', // Darker background for goals
         borderRadius: 5,
     },
     goalTitle: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: "#fff",
     },
-    closeButton: {
+    buttonRow: {
+        flexDirection: "row",
+        justifyContent: "space-evenly", // Distribute the buttons evenly
         marginTop: 20,
-        padding: 10,
-        backgroundColor: '#2196F3',
-        borderRadius: 5,
-    },
-    closeButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
+        width: "100%", // Ensure buttons take up full width of the container
     },
     acceptButton: {
-        marginTop: 10,
         padding: 10,
-        backgroundColor: 'green',
+        backgroundColor: "#28a745", // Green for accept
         borderRadius: 5,
-        width: '100%',
-    },
-    acceptButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        textAlign: 'center',
+        width: "30%", // Width for the buttons
     },
     declineButton: {
-        marginTop: 10,
         padding: 10,
-        backgroundColor: 'red',
+        backgroundColor: "#dc3545", // Red for decline
         borderRadius: 5,
-        width: '100%',
+        width: "30%", // Width for the buttons
     },
-    declineButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        textAlign: 'center',
+    closeButton: {
+        padding: 10,
+        backgroundColor: "#555", // Dark gray for close
+        borderRadius: 5,
+        width: "30%", // Width for the buttons
+    },
+    buttonText: {
+        color: "#fff", // Text color white
+        textAlign: "center",
+        fontWeight: "bold",
     },
 });

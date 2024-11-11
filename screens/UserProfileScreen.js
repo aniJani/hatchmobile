@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { useAuth } from "../contexts/auth";
 import { getUserByEmail, updateUser } from "../services/userServices";
 
-export default function UserProfileScreen() {
+export default function UserProfileScreen({ route }) {
   const { authData, loading, signOut } = useAuth();
   const [skills, setSkills] = useState("");
   const [description, setDescription] = useState("");
   const [openToCollaboration, setOpenToCollaboration] = useState(false);
   const [userLoading, setUserLoading] = useState(true);
 
+  // Check if the profile being viewed belongs to the logged-in user
+  const emailFromRoute = route?.params?.email;
+  const isOwnProfile = !emailFromRoute || emailFromRoute === authData.email;
+
   const loadUserProfile = async () => {
     try {
-      if (authData && authData.email) {
-        const userData = await getUserByEmail(authData.email);
+      const email = emailFromRoute || authData.email;
+      if (email) {
+        const userData = await getUserByEmail(email);
         setSkills(userData.skills.join(", "));
         setDescription(userData.description);
         setOpenToCollaboration(userData.openToCollaboration);
@@ -28,7 +33,7 @@ export default function UserProfileScreen() {
 
   const handleUpdateField = async (field, value) => {
     try {
-      const updatedUser = await updateUser(authData.email, { [field]: value });
+      await updateUser(authData.email, { [field]: value });
       Alert.alert("Success", `${field} updated successfully`);
     } catch (error) {
       console.error(`Failed to update ${field}:`, error);
@@ -49,22 +54,30 @@ export default function UserProfileScreen() {
   if (loading || userLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#fff" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User Profile</Text>
-
+      <Text style={styles.username}>User Profile</Text>
+      <Text style={styles.username}>{authData.name}</Text>
       <TextInput
         style={styles.input}
         placeholder="Skills (comma-separated)"
         value={skills}
         onChangeText={setSkills}
+        editable={isOwnProfile}
       />
-      <Button title="Update Skills" onPress={() => handleUpdateField("skills", skills.split(", ").map(s => s.trim()))} />
+      {isOwnProfile && (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleUpdateField("skills", skills.split(", ").map(s => s.trim()))}
+        >
+          <Text style={styles.buttonText}>Update Skills</Text>
+        </TouchableOpacity>
+      )}
 
       <TextInput
         style={styles.input}
@@ -72,21 +85,42 @@ export default function UserProfileScreen() {
         value={description}
         onChangeText={setDescription}
         multiline
+        editable={isOwnProfile}
       />
-      <Button title="Update Description" onPress={() => handleUpdateField("description", description)} />
+      {isOwnProfile && (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleUpdateField("description", description)}
+        >
+          <Text style={styles.buttonText}>Update Description</Text>
+        </TouchableOpacity>
+      )}
 
       <View style={styles.checkboxContainer}>
-        <Text>Open to Collaboration:</Text>
-        <Button
-          title={openToCollaboration ? "Yes" : "No"}
-          onPress={() => {
-            setOpenToCollaboration(!openToCollaboration);
-            handleUpdateField("openToCollaboration", !openToCollaboration);
-          }}
-        />
+        <Text style={styles.checkboxText}>Open to Collaboration:</Text>
+        {isOwnProfile ? (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setOpenToCollaboration(!openToCollaboration);
+              handleUpdateField("openToCollaboration", !openToCollaboration);
+            }}
+          >
+            <Text style={styles.buttonText}>{openToCollaboration ? "Yes" : "No"}</Text>
+          </TouchableOpacity>
+        ) : (
+          <Text style={styles.checkboxText}>{openToCollaboration ? "Yes" : "No"}</Text>
+        )}
       </View>
 
-      <Button title="Log Out" onPress={handleLogout} />
+      {isOwnProfile && (
+        <TouchableOpacity
+          style={[styles.button, styles.logoutButton]}
+          onPress={handleLogout}
+        >
+          <Text style={styles.buttonText}>Log Out</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -96,8 +130,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#272222", // Dark background color
   },
+  username: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
+  
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -108,16 +144,39 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     fontWeight: "bold",
+    color: "#fff", // White text color
   },
   input: {
     borderBottomWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     marginVertical: 10,
+    color: "#fff", // White text color
+    backgroundColor: "#3a3a3a", // Slightly darker background for input fields
+    borderRadius: 5, // Rounded borders for inputs
   },
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
+    justifyContent: "space-between", // Space between the text and button
+  },
+  checkboxText: {
+    color: "#fff", // White text color
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#444", // Dark background for buttons
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: "#fff", // White text color for buttons
+    fontWeight: "bold",
+  },
+  logoutButton: {
+    backgroundColor: "#dc3545", // Red color for logout button
   },
 });
