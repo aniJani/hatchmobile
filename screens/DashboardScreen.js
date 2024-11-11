@@ -1,7 +1,9 @@
+// DashboardScreen.js
+
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import SearchModal from "../components/searchModal";
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
@@ -37,7 +39,6 @@ export default function DashboardScreen({ navigation }) {
       setIsSearching(false);
     }
   };
-
 
   // Use useFocusEffect to fetch data when the screen comes into focus
   useFocusEffect(
@@ -79,13 +80,14 @@ export default function DashboardScreen({ navigation }) {
 
   const suggestCollaborators = async () => {
     try {
-      const query = userData.description || userData.skills.join(", ");
+      const query = userData.description || (Array.isArray(userData.skills) ? userData.skills.join(", ") : "");
       const collaborators = await findUserMatch(query, userData._id);
       setSuggestedCollaborators(collaborators.slice(0, 5));
     } catch (error) {
       console.error("Error finding user match:", error);
     }
   };
+
   const handleSearch = async (query) => {
     if (query.trim() === "") return;
     setHasSearched(true);
@@ -117,11 +119,9 @@ export default function DashboardScreen({ navigation }) {
         <Text style={styles.subText} numberOfLines={6}>
           {item.description}
         </Text>
-
       </TouchableOpacity>
     );
   };
-
 
   const renderCollaborator = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("ColabProfilePage", { collaborator: item })}>
@@ -131,8 +131,9 @@ export default function DashboardScreen({ navigation }) {
         </Text>
 
         <Text style={styles.subText} numberOfLines={2}>
-          {item.skills.join(", ")}
+          {Array.isArray(item.skills) ? item.skills.join(", ") : "No skills provided"}
         </Text>
+
         <Text style={styles.subText} numberOfLines={6}>
           {item.description}
         </Text>
@@ -151,15 +152,23 @@ export default function DashboardScreen({ navigation }) {
           !loading && <Text style={styles.email}>Loading user data...</Text>
         )}
 
-        {/* Updated "View Invites" button with icon */}
-        <TouchableOpacity onPress={() => navigation.navigate("InvitesScreen")} style={styles.inviteButton}>
-          <Ionicons name="mail" size={24} color="#FFFFFF" style={styles.inviteIcon} />
-        </TouchableOpacity>
+        {/* Icons Container */}
+        <View style={styles.iconsContainer}>
+          {/* Invitation Icon */}
+          <TouchableOpacity onPress={() => navigation.navigate("InvitesScreen")} style={styles.iconButton}>
+            <Ionicons name="mail" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          {/* Organization Icon */}
+          <TouchableOpacity onPress={() => navigation.navigate("OrganizationsScreen")} style={styles.iconButton}>
+            <Ionicons name="business" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Text style={styles.sectionTitle}>Current Projects</Text>
       {projects.length === 0 ? (
-        <Text>No projects available.</Text>
+        <Text style={styles.noDataText}>No projects available.</Text>
       ) : (
         <FlatList
           data={projects}
@@ -167,7 +176,7 @@ export default function DashboardScreen({ navigation }) {
           renderItem={renderProject}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listSpacing} // Added spacing
+          contentContainerStyle={styles.listSpacing}
         />
       )}
 
@@ -179,7 +188,7 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       {suggestedCollaborators.length === 0 ? (
-        <Text>No collaborators suggested.</Text>
+        <Text style={styles.noDataText}>No collaborators suggested.</Text>
       ) : (
         <FlatList
           data={suggestedCollaborators}
@@ -187,7 +196,7 @@ export default function DashboardScreen({ navigation }) {
           renderItem={renderCollaborator}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listSpacing} // Added spacing
+          contentContainerStyle={styles.listSpacing}
         />
       )}
 
@@ -206,27 +215,74 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, paddingTop: 45, backgroundColor: "#272222", paddingBottom: 80 },
-  headerContainer: { flexDirection: 'row', justifyContent: 'space-between' },
-  title: { fontSize: 20, textAlign: "center", marginBottom: 20, color: "#FFFFFF" },
-  username: { fontSize: 20, textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
-  email: { fontSize: 16, textAlign: "center", marginBottom: 5, color: "#FFFFFF" },
-  sectionTitle: { fontSize: 18, marginTop: 20, marginBottom: 10, color: "#FFFFFF" }, // Reduced marginBottom to 5
-  inviteButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 10 },
-  inviteIcon: { marginRight: 8 },
-
-  collaboratorsHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }, // Reduced marginBottom to 5
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 45,
+    backgroundColor: "#272222",
+    paddingBottom: 80,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  username: {
+    fontSize: 20,
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#FFFFFF",
+  },
+  email: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 5,
+    color: "#FFFFFF",
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    padding: 1,
+    marginLeft: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#FFFFFF",
+  },
+  noDataText: {
+    color: "#FFFFFF",
+    textAlign: 'center',
+    marginTop: 10,
+  },
   card: {
     padding: 12,
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 15,
     marginRight: 15,
-    width: 165, // Fixed width
-    height: 200, // Increased height
+    width: 165,
+    height: 200,
   },
-  cardTitle: { fontSize: 16, color: "#FFFFFF", marginVertical: 5 },
-  subText: { color: "rgba(255, 255, 255, 0.5)", margin: 2 },
-  iconButton: { padding: 10, backgroundColor: "transparent", borderRadius: 8 },
-  listSpacing: { paddingRight: 15 }, // Added padding for spacing between items
+  cardTitle: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    marginVertical: 5,
+  },
+  subText: {
+    color: "rgba(255, 255, 255, 0.5)",
+    margin: 2,
+  },
+  listSpacing: {
+    paddingRight: 15,
+  },
+  collaboratorsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
 });
 

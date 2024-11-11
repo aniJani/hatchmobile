@@ -11,6 +11,7 @@ import DashboardScreen from "./screens/DashboardScreen";
 import InitProject from "./screens/InitProject";
 import InvitesScreen from "./screens/InvitesScreen";
 import MatchmakingScreen from "./screens/MatchmakingScreen";
+import OrganizationsScreen from "./screens/OrganizationsScreen";
 import ProjectDetailScreen from "./screens/ProjectDetail"; // Import ProjectDetailScreen
 import RegisterScreen from "./screens/RegisterScreen";
 import SignInScreen from "./screens/SigninScreen";
@@ -95,6 +96,7 @@ const AppStack = () => (
     />
     <Stack.Screen name="ColabProfilePage" component={ColabProfilePage} />
     <Stack.Screen name="Dashboard" component={DashboardScreen} />
+    <Stack.Screen name="OrganizationsScreen" component={OrganizationsScreen} />
   </Stack.Navigator>
 );
 
