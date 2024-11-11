@@ -13,7 +13,6 @@ import InvitesScreen from './screens/InvitesScreen';
 import MatchmakingScreen from './screens/MatchmakingScreen';
 import ProjectDetailScreen from './screens/ProjectDetail'; // Import ProjectDetailScreen
 import RegisterScreen from './screens/RegisterScreen';
-import SettingsScreen from './screens/SettingsScreen'; // Example screen
 import SignInScreen from './screens/SigninScreen';
 import UserProfileScreen from './screens/UserProfileScreen';
 
@@ -23,36 +22,47 @@ const Tab = createBottomTabNavigator();
 
 const AppTabs = () => (
   <Tab.Navigator
-    screenOptions={{
-      tabBarStyle: {
-        position: 'absolute', // Makes the tab bar absolutely positioned
-        bottom: 10, // Distance from the bottom of the screen
-        left: 10, // Distance from the left side of the screen
-        right: 10, // Distance from the right side of the screen
-        backgroundColor: '#000000', // Background color of the tab bar
-        borderRadius: 15, // Rounded corners for a modern look
-        height: 60, // Height of the tab bar
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        let iconName;
+
+        // Determine the icon based on the route name
+        if (route.name === 'Dashboard') {
+          iconName = 'home-outline';
+        } else if (route.name === 'Profile') {
+          iconName = 'person-outline';
+        } else if (route.name === 'New Project') {
+          iconName = 'add-circle-outline';
+        }
+
+        // Return the Ionicons component with the appropriate icon
+        return <Ionicons name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: '#0000ff', // Color for active tab
+      tabBarStyle: {
+        position: 'absolute',
+        bottom: 10,
+        left: 10,
+        right: 10,
+        backgroundColor: '#1640D6', // Blue background
+        borderRadius: 30,
+        height: 60,
+        margin: 10,
+        padding: 10,
+        justifyContent: 'center', // Center items vertically
+        alignItems: 'center',
+      },
+      tabBarActiveTintColor: '#ffffff', // White color for active icon
       tabBarInactiveTintColor: 'gray',
-      headerShown: false // Color for inactive tab
-    }}
+      //tabBarShowLabel: false, // Hide tab labels
+      headerShown: false,
+    })}
   >
     <Tab.Screen name="Dashboard" component={DashboardScreen} />
     <Tab.Screen name="Profile" component={UserProfileScreen} />
-    <Tab.Screen name="Settings" component={SettingsScreen} />
-    <Tab.Screen
-      name="InitProject"
-      component={InitProject}
-      options={{
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons name="add-circle-outline" color={color} size={size} />
-        ),
-        tabBarLabel: "New Project", // Label for the Plus button
-      }}
-    />
+    <Tab.Screen name="New Project" component={InitProject} />
   </Tab.Navigator>
 );
+
 
 // AuthStack: Screens for authentication
 const AuthStack = () => (
@@ -87,7 +97,7 @@ const AppStack = () => (
       name="ColabProfilePage"
       component={ColabProfilePage}
     />
-    {/* Add more stack screens if needed */}
+    <Stack.Screen name="Dashboard" component={DashboardScreen} />
   </Stack.Navigator>
 );
 

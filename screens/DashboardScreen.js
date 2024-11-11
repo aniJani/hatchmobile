@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { ActivityIndicator, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 import SearchModal from "../components/searchModal";
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 import { loadProjects } from "../services/projectServices";
 import { getUserByEmail } from "../services/userServices";
+import { Ionicons } from '@expo/vector-icons';
 
 export default function DashboardScreen({ navigation }) {
   const { authData, loading } = useAuth();
@@ -15,12 +17,15 @@ export default function DashboardScreen({ navigation }) {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    if (!loading && authData) {
-      fetchUserData();
-      fetchProjects();
-    }
-  }, [loading, authData]);
+  // Use useFocusEffect to fetch data when the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (authData) {
+        fetchUserData();
+        fetchProjects();
+      }
+    }, [authData])
+  );
 
   useEffect(() => {
     if (userData) {
@@ -40,12 +45,16 @@ export default function DashboardScreen({ navigation }) {
   const fetchProjects = async () => {
     try {
       const projectData = await loadProjects(authData.email);
-      setProjects(projectData);
+  
+      // Sort projects by date, showing the newest project first
+      const sortedProjects = projectData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      setProjects(sortedProjects);
     } catch (error) {
       console.error("Error fetching projects:", error);
     }
   };
-
+  
   const suggestCollaborators = async () => {
     try {
       const query = userData.description || userData.skills.join(", ");
@@ -55,7 +64,6 @@ export default function DashboardScreen({ navigation }) {
       console.error("Error finding user match:", error);
     }
   };
-
   const handleSearch = async (query) => {
     if (query.trim() === "") return;
     setIsSearching(true);
@@ -69,46 +77,62 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  const renderProject = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.title}</Text>
-      <Text>{item.description}</Text>
-      <Button
-        title="View Project"
+  const renderProject = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={styles.card}
         onPress={() => navigation.navigate("ProjectDetail", { projectId: item._id })}
-      />
-    </View>
-  );
+      >
+        <Text style={styles.cardTitle} numberOfLines={1}>
+          {item.projectName}
+        </Text>
 
+        <Text style={styles.subText} numberOfLines={1}>
+          {item.collaborators.find((collab) => collab.role === "owner")?.email || "Unknown"}
+        </Text>
+
+        <Text style={styles.subText} numberOfLines={6}>
+          {item.description}
+        </Text>
+
+      </TouchableOpacity>
+    );
+  };
+  
+  
   const renderCollaborator = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("ColabProfilePage", { collaborator: item })}>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
-        <Text>Email: {item.email}</Text>
-        <Text>Description: {item.description}</Text>
-        <Text>Skills: {item.skills.join(", ")}</Text>
+        <Text style={styles.cardTitle} numberOfLines={2}>
+          {item.name}
+        </Text>
+
+        <Text style={styles.subText} numberOfLines={2}>
+          {item.skills.join(", ")}
+        </Text>
+        <Text style={styles.subText} numberOfLines={6}>
+          {item.description}
+        </Text>
       </View>
     </TouchableOpacity>
   );
-
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Dashboard</Text>
+      <View style={styles.headerContainer}>
+        {loading && <ActivityIndicator size="large" color="#FFFFFF" />}
 
-      {/* Separate Invites button */}
-      <Button
-        title="View Invites"
-        onPress={() => navigation.navigate("InvitesScreen")}
-        color="#007AFF"
-      />
+        {!loading && authData && userData ? (
+          <Text style={styles.username}>Welcome, {userData.name}!</Text>
+        ) : (
+          !loading && <Text style={styles.email}>Loading user data...</Text>
+        )}
 
-      {loading && <ActivityIndicator size="large" color="#0000ff" />}
-
-      {!loading && authData && userData ? (
-        <Text style={styles.email}>Welcome, {userData.name}!</Text>
-      ) : (
-        !loading && <Text style={styles.email}>Loading user data...</Text>
-      )}
+        {/* Updated "View Invites" button with icon */}
+        <TouchableOpacity onPress={() => navigation.navigate("InvitesScreen")} style={styles.inviteButton}>
+          <Ionicons name="mail" size={24} color="#FFFFFF" style={styles.inviteIcon} />
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.sectionTitle}>Current Projects</Text>
       {projects.length === 0 ? (
@@ -118,12 +142,17 @@ export default function DashboardScreen({ navigation }) {
           data={projects}
           keyExtractor={(item) => item._id.toString()}
           renderItem={renderProject}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listSpacing} // Added spacing
         />
       )}
 
       <View style={styles.collaboratorsHeader}>
         <Text style={styles.sectionTitle}>Suggested Collaborators</Text>
-        <Button title="Search" onPress={() => setIsModalVisible(true)} />
+        <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.iconButton}>
+          <Ionicons name="search" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
       {suggestedCollaborators.length === 0 ? (
@@ -133,6 +162,9 @@ export default function DashboardScreen({ navigation }) {
           data={suggestedCollaborators}
           keyExtractor={(item) => item._id.toString()}
           renderItem={renderCollaborator}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listSpacing} // Added spacing
         />
       )}
 
@@ -149,11 +181,27 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 20 },
-  email: { fontSize: 16, textAlign: "center", marginBottom: 10 },
-  sectionTitle: { fontSize: 20, fontWeight: "bold", marginTop: 20, marginBottom: 10 },
-  collaboratorsHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10, marginBottom: 10 },
-  card: { padding: 15, marginBottom: 10, backgroundColor: "#f9f9f9", borderRadius: 8 },
-  cardTitle: { fontSize: 18, fontWeight: "bold" },
+  container: { flex: 1, padding: 20, paddingTop: 45, backgroundColor: "#272222", paddingBottom: 80 },
+  headerContainer: { flexDirection: 'row', justifyContent: 'space-between' },
+  title: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 20, color: "#FFFFFF" },
+  username: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 10, color: "#FFFFFF" }, // Increased font size
+  email: { fontSize: 16, textAlign: "center", marginBottom: 5, color: "#FFFFFF" },
+  sectionTitle: { fontSize: 18, marginTop: 20, marginBottom: 10, color: "#FFFFFF" }, // Reduced marginBottom to 5
+  inviteButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: 10 },
+  inviteIcon: { marginRight: 8 },
+  inviteText: { fontSize: 16, fontWeight: "bold", color: "#FFFFFF" },
+  collaboratorsHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }, // Reduced marginBottom to 5
+  card: {
+    padding: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 15,
+    marginRight: 15,
+    width: 165, // Fixed width
+    height: 200, // Increased height
+  },
+  cardTitle: { fontSize: 16,  color: "#FFFFFF", marginVertical: 5 },
+  subText: { color: "rgba(255, 255, 255, 0.5)", margin:2 },
+  iconButton: { padding: 10, backgroundColor: "transparent", borderRadius: 8 },
+  listSpacing: { paddingRight: 15 }, // Added padding for spacing between items
 });
+
