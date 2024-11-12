@@ -184,7 +184,7 @@ export default function InitProject({ navigation }) {
                         >{`Estimated Time: ${task.estimatedTime}`}</Text>
                         <TouchableOpacity
                           onPress={() => startEditing(index)}
-                          style={[styles.editButton, styles.button]}
+                          style={[styles.editButton]}
                         >
                           <MaterialIcons name="edit" size={24} color="#fff" />
                           <Text style={styles.buttonText}>Edit</Text>
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#272222",
+    backgroundColor: "#000814",
     paddingBottom: 85,
     paddingTop: 60,
   },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlignVertical: "top",
     color: "#fff",
-    backgroundColor: "#333",
+    backgroundColor: "#1c2431",
   },
   loadingText: {
     textAlign: "center",
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     borderRadius: 20,
-    backgroundColor: "#2f2c2c",
+    backgroundColor: "#0e1623",
   },
   taskList: {
     marginTop: 10,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   taskCard: {
     padding: 15,
     marginBottom: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    backgroundColor: "#1c2431",
     borderRadius: 8,
   },
   taskTitle: {
@@ -286,12 +286,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginBottom: 10,
-    width: "48%", // Set a fixed width for buttons
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    width: "48%",
+    // Set a fixed width for buttons
+    backgroundColor: "#003380",
   },
   buttonText: {
     color: "#fff",
-
-    marginLeft: 5,
+  },
+  editButton: {
+    paddingHorizontal: 20,
+    paddingTop: 5,
+    borderRadius: 10,
+    alignSelf: "center",
+    backgroundColor: "#003380",
+    marginTop: 5,
   },
 });

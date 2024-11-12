@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#272222",
+    backgroundColor: "#000814",
     height: "100%",
   },
   headerContainer: {
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flexDirection: "column",
     justifyContent: "space-between",
-    backgroundColor: "#3b3636",
+    backgroundColor: "#0f1e2e",
     borderRadius: 20,
     marginBottom: 10,
     alignItems: "center",
@@ -356,13 +356,13 @@ const styles = StyleSheet.create({
   Container: {
     flex: 1,
     padding: 5,
-    backgroundColor: "#3b3636",
+    backgroundColor: "#0f1e2e",
     borderRadius: 18,
   },
   goalsContainer: {
     flex: 1,
     padding: 5,
-    backgroundColor: "#3b3636",
+    backgroundColor: "#0f1e2e",
   },
 
   projectTitleContainer: {
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     borderWidth: 1, // Add border width
-    backgroundColor: "#494444",
+    backgroundColor: "#213040",
   },
   goalTitle: {
     fontSize: 16,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginTop: 5,
-    backgroundColor: "#28a745", // Added background color for visibility
+    backgroundColor: "#2c45c9", // Added background color for visibility
   },
   noGoalsText: {
     fontSize: 14,
@@ -482,13 +482,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    backgroundColor: "#444", // Added background color
   },
   goBackButton: {
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    backgroundColor: "#444", // Added background color
   },
   buttonContent: {
     flexDirection: "row",

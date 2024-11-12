@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
 
-export default function ProjectSearchModal({ visible, onClose, projectId, projectGoals, projectCollaborators, navigation }) {
+export default function ProjectSearchModal({
+  visible,
+  onClose,
+  projectId,
+  projectGoals,
+  projectCollaborators,
+  navigation,
+}) {
   const { authData } = useAuth();
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -21,11 +36,16 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
 
     try {
       setIsSearching(true);
-      const goalsQuery = projectGoals.map((goal) => `${goal.title} ${goal.description}`).join(" ");
+      const goalsQuery = projectGoals
+        .map((goal) => `${goal.title} ${goal.description}`)
+        .join(" ");
       const results = await findUserMatch(goalsQuery, authData.userId);
 
       const filteredResults = results.filter(
-        (user) => !projectCollaborators.some((collaborator) => collaborator.email === user.email)
+        (user) =>
+          !projectCollaborators.some(
+            (collaborator) => collaborator.email === user.email
+          )
       );
 
       setSearchResults(filteredResults);
@@ -37,7 +57,12 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Suggested Collaborators</Text>
@@ -49,18 +74,26 @@ export default function ProjectSearchModal({ visible, onClose, projectId, projec
               data={searchResults}
               keyExtractor={(item) => item._id.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => {
-                  navigation.navigate("ColabProfilePage", { collaborator: item });
-                  onClose();
-                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("ColabProfilePage", {
+                      collaborator: item,
+                    });
+                    onClose();
+                  }}
+                >
                   <View style={styles.resultItem}>
                     <Text style={styles.whiteText}>{item.name}</Text>
                     <Text style={styles.whiteText}>{item.email}</Text>
-                    <Text style={styles.whiteText}>{item.skills.join(", ")}</Text>
+                    <Text style={styles.whiteText}>
+                      {item.skills.join(", ")}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               )}
-              ListEmptyComponent={<Text style={styles.whiteText}>No results found.</Text>}
+              ListEmptyComponent={
+                <Text style={styles.whiteText}>No results found.</Text>
+              }
             />
           )}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
@@ -82,12 +115,12 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "80%",
     padding: 20,
-    backgroundColor: "#272222", // Dark background color
+    backgroundColor: "#1c2431", // Dark background color
     borderRadius: 10,
   },
   modalTitle: {
     fontSize: 22,
-    
+
     marginBottom: 10,
     textAlign: "center",
     color: "#fff", // White text color
@@ -106,6 +139,5 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: "#fff", // White text color
-    
   },
 });

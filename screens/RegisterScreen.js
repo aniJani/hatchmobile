@@ -160,7 +160,7 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#272222",
+    backgroundColor: "#000814",
     paddingTop: 45,
   },
   scrollViewContainer: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
     color: "#fff",
-    backgroundColor: "#333",
+    backgroundColor: "#1c2431",
     borderRadius: 8,
   },
   switchContainer: {

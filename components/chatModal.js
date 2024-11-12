@@ -187,7 +187,7 @@ export default function ChatModal({ visible, onClose, projectId }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#272222",
+    backgroundColor: "#000814",
     paddingTop: 45,
   },
   header: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   hintContainer: {
     padding: 5,
-    backgroundColor: "#555",
+    backgroundColor: "#1c2431",
     borderRadius: 5,
     marginHorizontal: 15,
     marginBottom: 10,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     maxWidth: "80%",
   },
   myMessage: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#1c2431",
     alignSelf: "flex-end",
   },
   aiMessage: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   otherMessage: {
-    backgroundColor: "#444",
+    backgroundColor: "#1c2431",
     alignSelf: "flex-start",
   },
   messageSender: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     padding: 10,
-    backgroundColor: "#333",
+    backgroundColor: "#1c2431",
     alignItems: "center",
   },
   input: {
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#003380",
     borderRadius: 20,
     padding: 10,
   },

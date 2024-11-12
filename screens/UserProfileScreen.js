@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 60,
-    backgroundColor: "#272222",
+    backgroundColor: "#000814",
   },
   loadingContainer: {
     flex: 1,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-    backgroundColor: "#333",
+    backgroundColor: "#1c2431",
     borderRadius: 30,
   },
   sectionTitle: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   inputDescription: {
     width: "100%",
-    backgroundColor: "#333",
+    backgroundColor: "#1c2431",
     color: "#fff",
     padding: 10,
     borderRadius: 15,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     alignContent: "left",
   },
   input: {
-    backgroundColor: "#333",
+    backgroundColor: "#1c2431",
     color: "#fff",
     padding: 10,
     borderRadius: 15,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   updateButton: {
-    backgroundColor: "#2c45c9",
+    backgroundColor: "#003380",
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: "center",

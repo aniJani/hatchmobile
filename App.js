@@ -43,7 +43,7 @@ const AppTabs = () => (
         bottom: 10,
         left: 10,
         right: 10,
-        backgroundColor: "#535353", // Blue background
+        backgroundColor: "#1c2431", // Blue background
         borderRadius: 30,
         height: 60,
         margin: 10,
@@ -53,8 +53,8 @@ const AppTabs = () => (
         borderTopWidth: 0, // Remove top border
         shadowOpacity: 0, // Disable shadow
       },
-      tabBarActiveTintColor: "#ffffff", // White color for active icon
-      tabBarInactiveTintColor: "#272222",
+      tabBarActiveTintColor: "#2c45c9", // White color for active icon
+      tabBarInactiveTintColor: "white",
       //tabBarShowLabel: false, // Hide tab labels
       headerShown: false,
     })}
