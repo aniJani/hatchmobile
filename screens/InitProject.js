@@ -1,8 +1,19 @@
 import React, { useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import MaterialIcons
 import { useAuth } from "../contexts/auth";
-import { createTaskDivision, saveProjectToDatabase } from "../services/goalDivision";
+import {
+  createTaskDivision,
+  saveProjectToDatabase,
+} from "../services/goalDivision";
 
 export default function InitProject({ navigation }) {
   const { authData } = useAuth();
@@ -12,7 +23,11 @@ export default function InitProject({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [expandedTaskIndex, setExpandedTaskIndex] = useState(null);
   const [editingTaskIndex, setEditingTaskIndex] = useState(null);
-  const [editedTask, setEditedTask] = useState({ stepTitle: "", description: "", estimatedTime: "" });
+  const [editedTask, setEditedTask] = useState({
+    stepTitle: "",
+    description: "",
+    estimatedTime: "",
+  });
 
   const handleGenerateTasks = async () => {
     if (!projectDescription.trim()) {
@@ -71,12 +86,11 @@ export default function InitProject({ navigation }) {
 
   return (
     <View style={styles.container}>
-
-
       <Text style={styles.title}>Project Task Generator</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter project name..."
+        placeholderTextColor="gray"
         value={projectName}
         onChangeText={(text) => setProjectName(text)}
       />
@@ -84,12 +98,12 @@ export default function InitProject({ navigation }) {
         style={styles.input}
         multiline
         placeholder="Describe your project..."
+        placeholderTextColor="gray"
         value={projectDescription}
         onChangeText={(text) => setProjectDescription(text)}
       />
 
       <View style={styles.buttonContainer}>
-        
         <TouchableOpacity
           onPress={handleGenerateTasks}
           style={[styles.generateButton, styles.button]}
@@ -99,7 +113,10 @@ export default function InitProject({ navigation }) {
           <Text style={styles.buttonText}>Generate Tasks</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleSaveTasks} style={[styles.doneButton, styles.button]}>
+        <TouchableOpacity
+          onPress={handleSaveTasks}
+          style={[styles.doneButton, styles.button]}
+        >
           <MaterialIcons name="done" size={24} color="#fff" />
           <Text style={styles.buttonText}>Done</Text>
         </TouchableOpacity>
@@ -108,58 +125,78 @@ export default function InitProject({ navigation }) {
       {loading ? (
         <Text style={styles.loadingText}>Generating tasks...</Text>
       ) : (
-        <ScrollView style={styles.taskList}>
-          {tasks.map((task, index) => (
-            <View key={index} style={styles.taskCard}>
-              <TouchableOpacity onPress={() => toggleDropdown(index)}>
-                <Text style={styles.taskTitle}>{`${task.stepNumber || index + 1}: ${task.stepTitle}`}</Text>
-              </TouchableOpacity>
-              {expandedTaskIndex === index && (
-                <View style={styles.taskDetails}>
-                  {editingTaskIndex === index ? (
-                    <>
-                      <TextInput
-                        style={styles.editInput}
-                        placeholder="Task Title"
-                        value={editedTask.stepTitle}
-                        onChangeText={(text) => setEditedTask({ ...editedTask, stepTitle: text })}
-                      />
-                      <TextInput
-                        style={styles.editInput}
-                        placeholder="Task Description"
-                        multiline
-                        value={editedTask.description}
-                        onChangeText={(text) => setEditedTask({ ...editedTask, description: text })}
-                      />
-                      <TextInput
-                        style={styles.editInput}
-                        placeholder="Estimated Time"
-                        value={editedTask.estimatedTime}
-                        onChangeText={(text) => setEditedTask({ ...editedTask, estimatedTime: text })}
-                      />
-                      <TouchableOpacity onPress={saveEditedTask} style={[styles.saveButton, styles.button]}>
-                        <MaterialIcons name="save" size={24} color="#fff" />
-                        <Text style={styles.buttonText}>Save</Text>
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.taskDescription}>{task.description}</Text>
-                      <Text style={styles.taskTime}>{`Estimated Time: ${task.estimatedTime}`}</Text>
-                      <TouchableOpacity
-                        onPress={() => startEditing(index)}
-                        style={[styles.editButton, styles.button]}
-                      >
-                        <MaterialIcons name="edit" size={24} color="#fff" />
-                        <Text style={styles.buttonText}>Edit</Text>
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
-              )}
-            </View>
-          ))}
-        </ScrollView>
+        <View style={styles.taskContainer}>
+          <ScrollView style={styles.taskList}>
+            {tasks.map((task, index) => (
+              <View key={index} style={styles.taskCard}>
+                <TouchableOpacity onPress={() => toggleDropdown(index)}>
+                  <Text style={styles.taskTitle}>{`${
+                    task.stepNumber || index + 1
+                  }: ${task.stepTitle}`}</Text>
+                </TouchableOpacity>
+                {expandedTaskIndex === index && (
+                  <View style={styles.taskDetails}>
+                    {editingTaskIndex === index ? (
+                      <>
+                        <TextInput
+                          style={styles.editInput}
+                          placeholder="Task Title"
+                          value={editedTask.stepTitle}
+                          onChangeText={(text) =>
+                            setEditedTask({ ...editedTask, stepTitle: text })
+                          }
+                        />
+                        <TextInput
+                          style={styles.editInput}
+                          placeholder="Task Description"
+                          multiline
+                          value={editedTask.description}
+                          onChangeText={(text) =>
+                            setEditedTask({ ...editedTask, description: text })
+                          }
+                        />
+                        <TextInput
+                          style={styles.editInput}
+                          placeholder="Estimated Time"
+                          value={editedTask.estimatedTime}
+                          onChangeText={(text) =>
+                            setEditedTask({
+                              ...editedTask,
+                              estimatedTime: text,
+                            })
+                          }
+                        />
+                        <TouchableOpacity
+                          onPress={saveEditedTask}
+                          style={[styles.saveButton, styles.button]}
+                        >
+                          <MaterialIcons name="save" size={24} color="#fff" />
+                          <Text style={styles.buttonText}>Save</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.taskDescription}>
+                          {task.description}
+                        </Text>
+                        <Text
+                          style={styles.taskTime}
+                        >{`Estimated Time: ${task.estimatedTime}`}</Text>
+                        <TouchableOpacity
+                          onPress={() => startEditing(index)}
+                          style={[styles.editButton, styles.button]}
+                        >
+                          <MaterialIcons name="edit" size={24} color="#fff" />
+                          <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                  </View>
+                )}
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       )}
     </View>
   );
@@ -168,14 +205,15 @@ export default function InitProject({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: "#272222",
     paddingBottom: 85,
-    paddingTop: 45
+    paddingTop: 45,
+    marginTop: 20,
   },
   title: {
     fontSize: 20,
-    
+
     textAlign: "center",
     marginBottom: 20,
     color: "#fff",
@@ -196,8 +234,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
   },
+  taskContainer: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "#2f2c2c",
+  },
   taskList: {
-    marginTop: 20,
+    marginTop: 10,
   },
   taskCard: {
     padding: 15,
@@ -207,7 +251,7 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     fontSize: 18,
-    
+
     color: "#fff",
   },
   taskDetails: {
@@ -249,9 +293,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    
+
     marginLeft: 5,
   },
-  
-  
 });
