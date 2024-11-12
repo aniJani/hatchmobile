@@ -25,12 +25,11 @@ export default function ChatModal({ visible, onClose, projectId }) {
     const [sending, setSending] = useState(false);
     const pollingInterval = useRef(null); // Reference to the polling interval
 
-    const BACKEND_URL = 'http://10.16.28.214:3000'; // Replace with your backend URL
+    const BACKEND_URL = `http://${process.env.BASE_URL}`; // Ensure correct endpoint
 
     // Function to fetch messages
     const fetchMessages = async () => {
         try {
-            // Fetch only the latest 50 messages
             const response = await axios.get(`${BACKEND_URL}/chat/${projectId}?limit=50`);
             setMessages(response.data);
         } catch (error) {
@@ -83,15 +82,17 @@ export default function ChatModal({ visible, onClose, projectId }) {
     // Render each message
     const renderMessage = ({ item }) => {
         const isMyMessage = item.sender === authData.email;
+        const isAIMessage = item.sender === 'AI';
 
         return (
             <View
                 style={[
                     styles.messageBubble,
-                    isMyMessage ? styles.myMessage : styles.otherMessage,
+                    isMyMessage ? styles.myMessage : isAIMessage ? styles.aiMessage : styles.otherMessage,
                 ]}
             >
-                {!isMyMessage && <Text style={styles.messageSender}>{item.sender}</Text>}
+                {!isMyMessage && !isAIMessage && <Text style={styles.messageSender}>{item.sender}</Text>}
+                {isAIMessage && <Text style={styles.messageSender}>AI</Text>}
                 <Text style={styles.messageContent}>{item.content}</Text>
                 <Text style={styles.messageTimestamp}>
                     {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -112,6 +113,11 @@ export default function ChatModal({ visible, onClose, projectId }) {
                     <TouchableOpacity onPress={onClose}>
                         <MaterialIcons name="close" size={24} color="#fff" />
                     </TouchableOpacity>
+                </View>
+
+                {/* Optional: AI Interaction Hint */}
+                <View style={styles.hintContainer}>
+                    <Text style={styles.hintText}>Type @chatAI followed by your question to interact with the AI.</Text>
                 </View>
 
                 {/* Messages */}
@@ -165,6 +171,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#fff',
     },
+    hintContainer: {
+        padding: 5,
+        backgroundColor: '#555',
+        borderRadius: 5,
+        marginHorizontal: 15,
+        marginBottom: 10,
+    },
+    hintText: {
+        color: '#fff',
+        fontSize: 12,
+        textAlign: 'center',
+    },
     messagesContainer: {
         flex: 1,
         padding: 10,
@@ -178,6 +196,10 @@ const styles = StyleSheet.create({
     myMessage: {
         backgroundColor: '#28a745',
         alignSelf: 'flex-end',
+    },
+    aiMessage: {
+        backgroundColor: '#007bff', // Different color for AI messages
+        alignSelf: 'flex-start',
     },
     otherMessage: {
         backgroundColor: '#444',
