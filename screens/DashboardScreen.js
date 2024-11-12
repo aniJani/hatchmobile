@@ -1,9 +1,16 @@
 // DashboardScreen.js
 
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import SearchModal from "../components/searchModal";
 import { useAuth } from "../contexts/auth";
 import { findUserMatch } from "../services/matchFinder";
@@ -70,7 +77,9 @@ export default function DashboardScreen({ navigation }) {
       const projectData = await loadProjects(authData.email);
 
       // Sort projects by date, showing the newest project first
-      const sortedProjects = projectData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const sortedProjects = projectData.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
       setProjects(sortedProjects);
     } catch (error) {
@@ -80,7 +89,9 @@ export default function DashboardScreen({ navigation }) {
 
   const suggestCollaborators = async () => {
     try {
-      const query = userData.description || (Array.isArray(userData.skills) ? userData.skills.join(", ") : "");
+      const query =
+        userData.description ||
+        (Array.isArray(userData.skills) ? userData.skills.join(", ") : "");
       const collaborators = await findUserMatch(query, userData._id);
       setSuggestedCollaborators(collaborators.slice(0, 5));
     } catch (error) {
@@ -106,14 +117,17 @@ export default function DashboardScreen({ navigation }) {
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => navigation.navigate("ProjectDetail", { projectId: item._id })}
+        onPress={() =>
+          navigation.navigate("ProjectDetail", { projectId: item._id })
+        }
       >
         <Text style={styles.cardTitle} numberOfLines={1}>
           {item.projectName}
         </Text>
 
         <Text style={styles.subText} numberOfLines={1}>
-          {item.collaborators.find((collab) => collab.role === "owner")?.email || "Unknown"}
+          {item.collaborators.find((collab) => collab.role === "owner")
+            ?.email || "Unknown"}
         </Text>
 
         <Text style={styles.subText} numberOfLines={6}>
@@ -124,14 +138,20 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const renderCollaborator = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("ColabProfilePage", { collaborator: item })}>
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("ColabProfilePage", { collaborator: item })
+      }
+    >
       <View style={styles.card}>
         <Text style={styles.cardTitle} numberOfLines={2}>
           {item.name}
         </Text>
 
         <Text style={styles.subText} numberOfLines={2}>
-          {Array.isArray(item.skills) ? item.skills.join(", ") : "No skills provided"}
+          {Array.isArray(item.skills)
+            ? item.skills.join(", ")
+            : "No skills provided"}
         </Text>
 
         <Text style={styles.subText} numberOfLines={6}>
@@ -143,30 +163,41 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        {loading && <ActivityIndicator size="large" color="#FFFFFF" />}
-
-        {!loading && authData && userData ? (
-          <Text style={styles.username}>Welcome, {userData.name}!</Text>
-        ) : (
-          !loading && <Text style={styles.email}>Loading user data...</Text>
-        )}
-
+      <View style={styles.top}>
+        <View style={styles.avatarPlaceholder}>
+          {/* Replace with actual user avatar */}
+          <Text style={styles.avatarText}>👤</Text>
+        </View>
         {/* Icons Container */}
         <View style={styles.iconsContainer}>
           {/* Invitation Icon */}
-          <TouchableOpacity onPress={() => navigation.navigate("InvitesScreen")} style={styles.iconButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("InvitesScreen")}
+            style={styles.iconButton}
+          >
             <Ionicons name="mail" size={24} color="#FFFFFF" />
           </TouchableOpacity>
 
           {/* Organization Icon */}
-          <TouchableOpacity onPress={() => navigation.navigate("OrganizationsScreen")} style={styles.iconButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("OrganizationsScreen")}
+            style={styles.iconButton}
+          >
             <Ionicons name="business" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
+      <View style={styles.headerContainer}>
+        {loading && <ActivityIndicator size="large" color="#FFFFFF" />}
 
-      <Text style={styles.sectionTitle}>Current Projects</Text>
+        {!loading && authData && userData ? (
+          <Text style={styles.username}> {userData.name}</Text>
+        ) : (
+          !loading && <Text style={styles.email}>Loading user data...</Text>
+        )}
+      </View>
+
+      <Text style={styles.sectionTitle}>My Projects</Text>
       {projects.length === 0 ? (
         <Text style={styles.noDataText}>No projects available.</Text>
       ) : (
@@ -182,7 +213,10 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.collaboratorsHeader}>
         <Text style={styles.sectionTitle}>Suggested Collaborators</Text>
-        <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => setIsModalVisible(true)}
+          style={styles.iconButton}
+        >
           <Ionicons name="search" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
@@ -218,17 +252,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 45,
+    paddingTop: 30,
     backgroundColor: "#272222",
     paddingBottom: 80,
   },
+  avatarPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 40,
+    backgroundColor: "#333",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
+    marginTop: 15,
+  },
+  avatarText: {
+    fontSize: 20,
+    color: "#fff",
+  },
+  top: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   username: {
     fontSize: 20,
+    marginTop: 20,
     textAlign: "center",
     marginBottom: 10,
     color: "#FFFFFF",
@@ -240,8 +294,8 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   iconsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconButton: {
     padding: 1,
@@ -255,7 +309,7 @@ const styles = StyleSheet.create({
   },
   noDataText: {
     color: "#FFFFFF",
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 10,
   },
   card: {
@@ -279,10 +333,9 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   collaboratorsHeader: {
+    marginTop: -20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 5,
   },
 });
-

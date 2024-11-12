@@ -208,8 +208,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#272222",
     paddingBottom: 85,
-    paddingTop: 45,
-    marginTop: 20,
+    paddingTop: 60,
   },
   title: {
     fontSize: 20,
@@ -251,7 +250,6 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     fontSize: 18,
-
     color: "#fff",
   },
   taskDetails: {

@@ -70,10 +70,6 @@ export default function UserProfileScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.avatarPlaceholder}>
-        {/* Replace with actual user avatar */}
-        <Text style={styles.avatarText}>👤</Text>
-      </View>
       <Text style={styles.username}>{authData.name}</Text>
       <View style={styles.section}>
         <TextInput
@@ -116,7 +112,7 @@ export default function UserProfileScreen({ route }) {
         )}
       </View>
       <View style={styles.sectionCollab}>
-        <Text style={styles.updateButtonText}>Open to Collaboration:</Text>
+        <Text style={styles.sectionTitleCollab}>Open to Collaboration:</Text>
 
         <View style={styles.switchContainer}>
           {isOwnProfile && (
@@ -191,24 +187,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     backgroundColor: "#333",
-    padding: 8,
     borderRadius: 30,
-    marginBottom: 10,
-    marginTop: 10,
   },
   sectionTitle: {
     fontSize: 16,
+    alignSelf: "center",
     color: "#fff",
     marginBottom: 5,
   },
   sectionTitleCollab: {
     fontSize: 14,
+    padding: 10,
     color: "#fff",
-    marginBottom: 5,
   },
   inputDescription: {
     width: "100%",
-    height: 80,
     backgroundColor: "#333",
     color: "#fff",
     padding: 10,
@@ -249,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   logoutButtonText: {
-    color: "#fff",
+    color: "red",
     fontSize: 14,
   },
   deleteButton: {
