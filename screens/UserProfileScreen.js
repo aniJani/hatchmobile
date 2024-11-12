@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   updateButton: {
-    backgroundColor: "#rgba(255, 255, 255, 0.05)",
+    backgroundColor: "#2c45c9",
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: "center",

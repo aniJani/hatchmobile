@@ -13,18 +13,21 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  FlatList,
+  Animated,
 } from "react-native";
 import ChatModal from "../components/chatModal"; // Import ChatModal
 import CollaboratorSelectionModal from "../components/CollaboratorSelectionModal";
 import ProjectSearchModal from "../components/ProjectSearchModal";
-import { useAuth } from '../contexts/auth'; // Import useAuth if needed
+import { useAuth } from "../contexts/auth"; // Import useAuth if needed
 import { editProjectById, getProjectById } from "../services/projectServices";
-
+import { Divider } from "react-native-paper";
 export default function ProjectDetailScreen({ route, navigation }) {
   const { projectId } = route.params;
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isProjectSearchModalVisible, setIsProjectSearchModalVisible] = useState(false);
+  const [isProjectSearchModalVisible, setIsProjectSearchModalVisible] =
+    useState(false);
   const [updatedProject, setUpdatedProject] = useState({});
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [selectedGoalIndex, setSelectedGoalIndex] = useState(null);
@@ -96,7 +99,10 @@ export default function ProjectDetailScreen({ route, navigation }) {
     <View style={styles.container}>
       {/* Header with Go Back and Explore Buttons */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.goBackButton}
+          onPress={() => navigation.goBack()}
+        >
           <MaterialIcons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity
@@ -108,129 +114,181 @@ export default function ProjectDetailScreen({ route, navigation }) {
       </View>
 
       {/* Project Title */}
-      <View style={styles.projectTitleContainer}>
-        <Text style={styles.title}>{project.projectName}</Text>
+      <View style={styles.mainContainer}>
+        <View style={styles.projectTitleContainer}>
+          <Text style={styles.title}>{project.projectName}</Text>
+        </View>
+        <Divider></Divider>
+        {/* Project Description */}
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.description}>{project.description}</Text>
+        </View>
       </View>
-
-      {/* Project Description */}
-      <Text style={styles.description}>{project.description}</Text>
-
       {/* Goals Section */}
-      <Text style={styles.sectionTitle}>Goals:</Text>
-      {Array.isArray(updatedProject.goals) && updatedProject.goals.length > 0 ? (
-        updatedProject.goals.map((goal, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.goalCard,
-              {
-                borderColor:
-                  goal.status === "not started"
-                    ? "#ff4d4d"
-                    : goal.status === "in progress"
-                      ? "#ffa500"
-                      : "#28a745",
-              },
-            ]}
-            onPress={() => setEditableGoalIndex(index)}
-          >
-            {editableGoalIndex === index ? (
-              <>
-                {/* Header with Cancel and Save Icons */}
-                <View style={styles.assignContainer}>
-                  <TouchableOpacity onPress={() => setEditableGoalIndex(null)}>
-                    <MaterialIcons name="cancel" size={24} color="#fff" />
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handleSaveChanges}>
-                    <MaterialIcons name="check" size={24} color="#fff" />
-                  </TouchableOpacity>
-                </View>
+      <View style={styles.Container}>
+        <ScrollView
+          style={styles.goalsContainer}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+        >
+          <Text style={styles.sectionTitle}>Goals:</Text>
+          {Array.isArray(updatedProject.goals) &&
+          updatedProject.goals.length > 0 ? (
+            updatedProject.goals.map((goal, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.goalCard,
+                  {
+                    borderColor:
+                      goal.status === "not started"
+                        ? "#ff4d4d"
+                        : goal.status === "in progress"
+                        ? "#ffa500"
+                        : "#28a745",
+                  },
+                ]}
+                onPress={() => setEditableGoalIndex(index)}
+              >
+                {editableGoalIndex === index ? (
+                  <>
+                    {/* Header with Cancel and Save Icons */}
+                    <View style={styles.assignContainer}>
+                      <TouchableOpacity
+                        onPress={() => setEditableGoalIndex(null)}
+                      >
+                        <MaterialIcons name="cancel" size={24} color="#fff" />
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={handleSaveChanges}>
+                        <MaterialIcons name="check" size={24} color="#fff" />
+                      </TouchableOpacity>
+                    </View>
 
-                {/* Goal Title Input */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="Goal Title"
-                  value={goal.title}
-                  onChangeText={(text) => handleInputChange("title", text, index)}
-                  placeholderTextColor="#bbb"
-                />
+                    {/* Goal Title Input */}
 
-                {/* Goal Description Input */}
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder="Goal Description"
-                  multiline
-                  value={goal.description}
-                  onChangeText={(text) => handleInputChange("description", text, index)}
-                  placeholderTextColor="#bbb"
-                />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Goal Title"
+                      value={goal.title}
+                      onChangeText={(text) =>
+                        handleInputChange("title", text, index)
+                      }
+                      placeholderTextColor="#bbb"
+                    />
 
-                {/* Status Buttons */}
-                <View style={styles.statusButtonsContainer}>
-                  <TouchableOpacity
-                    style={[
-                      styles.statusButton,
-                      { borderColor: goal.status === "not started" ? "#ff4d4d" : "#ccc" },
-                    ]}
-                    onPress={() => handleInputChange("status", "not started", index)}
-                  >
-                    <Text style={styles.statusButtonText}>Not Started</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.statusButton,
-                      { borderColor: goal.status === "in progress" ? "#ffa500" : "#ccc" },
-                    ]}
-                    onPress={() => handleInputChange("status", "in progress", index)}
-                  >
-                    <Text style={styles.statusButtonText}>In Progress</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.statusButton,
-                      { borderColor: goal.status === "completed" ? "#28a745" : "#ccc" },
-                    ]}
-                    onPress={() => handleInputChange("status", "completed", index)}
-                  >
-                    <Text style={styles.statusButtonText}>Completed</Text>
-                  </TouchableOpacity>
-                </View>
+                    {/* Goal Description Input */}
+                    <TextInput
+                      style={[styles.input, styles.textArea]}
+                      placeholder="Goal Description"
+                      multiline
+                      value={goal.description}
+                      onChangeText={(text) =>
+                        handleInputChange("description", text, index)
+                      }
+                      placeholderTextColor="#bbb"
+                    />
 
-                {/* Assigned To Section */}
-                <View style={styles.assignContainer}>
-                  <Text style={styles.goalSectionLabel}>Assigned To:</Text>
-                  <Text style={styles.goalDescription}>{goal.assignedTo}</Text>
-                  <TouchableOpacity
-                    style={styles.assignButton}
-                    onPress={() => openAssignCollaboratorModal(index)}
-                  >
-                    <MaterialIcons name="person-add" size={24} color="#fff" />
-                  </TouchableOpacity>
-                </View>
+                    {/* Status Buttons */}
+                    <View style={styles.statusButtonsContainer}>
+                      <TouchableOpacity
+                        style={[
+                          styles.statusButton,
+                          {
+                            borderColor:
+                              goal.status === "not started"
+                                ? "#ff4d4d"
+                                : "#ccc",
+                          },
+                        ]}
+                        onPress={() =>
+                          handleInputChange("status", "not started", index)
+                        }
+                      >
+                        <Text style={styles.statusButtonText}>Not Started</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.statusButton,
+                          {
+                            borderColor:
+                              goal.status === "in progress"
+                                ? "#ffa500"
+                                : "#ccc",
+                          },
+                        ]}
+                        onPress={() =>
+                          handleInputChange("status", "in progress", index)
+                        }
+                      >
+                        <Text style={styles.statusButtonText}>In Progress</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.statusButton,
+                          {
+                            borderColor:
+                              goal.status === "completed" ? "#28a745" : "#ccc",
+                          },
+                        ]}
+                        onPress={() =>
+                          handleInputChange("status", "completed", index)
+                        }
+                      >
+                        <Text style={styles.statusButtonText}>Completed</Text>
+                      </TouchableOpacity>
+                    </View>
 
-                {/* Estimated Time Input */}
-                <Text style={styles.goalSectionLabel}>Estimated Time:</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Estimated Time"
-                  value={goal.estimatedTime}
-                  onChangeText={(text) => handleInputChange("estimatedTime", text, index)}
-                  placeholderTextColor="#bbb"
-                />
-              </>
-            ) : (
-              <>
-                <Text style={styles.goalTitle}>{goal.title}</Text>
-                <Text style={styles.goalDescription}>{goal.description}</Text>
-                <Text style={styles.goalDescription}>Assigned to: {goal.assignedTo}</Text>
-                <Text style={styles.goalDescription}>Estimated Time: {goal.estimatedTime}</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        ))
-      ) : (
-        <Text style={styles.noGoalsText}>No goals specified.</Text>
-      )}
+                    {/* Assigned To Section */}
+                    <View style={styles.assignContainer}>
+                      <Text style={styles.goalSectionLabel}>Assigned To:</Text>
+                      <Text style={styles.goalDescription}>
+                        {goal.assignedTo}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.assignButton}
+                        onPress={() => openAssignCollaboratorModal(index)}
+                      >
+                        <MaterialIcons
+                          name="person-add"
+                          size={24}
+                          color="#fff"
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Estimated Time Input */}
+                    <Text style={styles.goalSectionLabel}>Estimated Time:</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Estimated Time"
+                      value={goal.estimatedTime}
+                      onChangeText={(text) =>
+                        handleInputChange("estimatedTime", text, index)
+                      }
+                      placeholderTextColor="#bbb"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.goalTitle}>{goal.title}</Text>
+                    <Text style={styles.goalDescription}>
+                      {goal.description}
+                    </Text>
+                    <Text style={styles.goalDescription}>
+                      Assigned to: {goal.assignedTo}
+                    </Text>
+                    <Text style={styles.goalDescription}>
+                      Estimated Time: {goal.estimatedTime}
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noGoalsText}>No goals specified.</Text>
+          )}
+        </ScrollView>
+      </View>
 
       {/* Project Search Modal */}
       <ProjectSearchModal
@@ -247,7 +305,9 @@ export default function ProjectDetailScreen({ route, navigation }) {
         visible={assignModalVisible}
         onClose={() => setAssignModalVisible(false)}
         projectCollaborators={project.collaborators}
-        goalDescription={updatedProject.goals[selectedGoalIndex]?.description || ""}
+        goalDescription={
+          updatedProject.goals[selectedGoalIndex]?.description || ""
+        }
         navigation={navigation}
         onSelectCollaborator={assignCollaboratorToGoal}
       />
@@ -276,6 +336,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#272222",
+    height: "100%",
   },
   headerContainer: {
     flexDirection: "row",
@@ -283,13 +344,55 @@ const styles = StyleSheet.create({
     marginTop: 25,
     marginBottom: 15,
   },
-  projectTitleContainer: {
+  mainContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    backgroundColor: "#3b3636",
+    borderRadius: 20,
     marginBottom: 10,
+    alignItems: "center",
   },
+
+  Container: {
+    flex: 1,
+    padding: 5,
+    backgroundColor: "#3b3636",
+    borderRadius: 18,
+  },
+  goalsContainer: {
+    flex: 1,
+    padding: 5,
+    backgroundColor: "#3b3636",
+  },
+
+  projectTitleContainer: {
+    paddingTop: 15,
+  },
+
   statusButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: 10,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    marginBottom: 15,
+  },
+  statusButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginHorizontal: 5,
+  },
+  activeStatus: {
+    backgroundColor: "#3A78F2",
+  },
+  inactiveStatus: {
+    backgroundColor: "#2B2B3A",
+  },
+  statusText: {
+    color: "#FFFFFF",
+    fontWeight: "500",
   },
   statusButton: {
     flex: 1,
@@ -310,8 +413,9 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: "rgba(255, 255, 255, 0.5)",
+    color: "#f5f5f5",
     marginBottom: 20,
+    padding: 8,
   },
   sectionTitle: {
     fontSize: 18,
@@ -324,6 +428,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     borderWidth: 1, // Add border width
+    backgroundColor: "#494444",
   },
   goalTitle: {
     fontSize: 16,
@@ -341,7 +446,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginVertical: 5,
-    color: '#fff',
+    color: "#fff",
   },
   textArea: {
     height: 80,
@@ -361,7 +466,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginTop: 5,
-    backgroundColor: '#28a745', // Added background color for visibility
+    backgroundColor: "#28a745", // Added background color for visibility
   },
   noGoalsText: {
     fontSize: 14,
@@ -377,13 +482,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    backgroundColor: '#444', // Added background color
+    backgroundColor: "#444", // Added background color
   },
   goBackButton: {
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    backgroundColor: '#444', // Added background color
+    backgroundColor: "#444", // Added background color
   },
   buttonContent: {
     flexDirection: "row",
@@ -406,22 +511,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   chatButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 30,
-    backgroundColor: '#28a745',
+    backgroundColor: "#2c45c9",
     borderRadius: 30,
     padding: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
   },
   chatButtonText: {
-    color: '#fff',
+    color: "#fff",
     marginLeft: 10,
     fontSize: 16,
   },
