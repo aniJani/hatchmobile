@@ -161,10 +161,76 @@ export default function OrganizationsScreen({ navigation }) {
             )}
 
             {/* Modal for Creating Organization */}
-            {/* ... existing create organization modal code ... */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isCreateModalVisible}
+                onRequestClose={() => setIsCreateModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Create a New Organization</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Organization Name"
+                            placeholderTextColor="#bbb"
+                            value={orgName}
+                            onChangeText={setOrgName}
+                        />
+                        {createMessage ? <Text style={styles.message}>{createMessage}</Text> : null}
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity style={styles.modalButton} onPress={handleCreateOrganization}>
+                                <Text style={styles.modalButtonText}>Create</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => {
+                                    setIsCreateModalVisible(false);
+                                    setCreateMessage('');
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Modal for Joining Organization */}
-            {/* ... existing join organization modal code ... */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isJoinModalVisible}
+                onRequestClose={() => setIsJoinModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Join an Organization</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Invite Code"
+                            placeholderTextColor="#bbb"
+                            value={inviteCode}
+                            onChangeText={setInviteCode}
+                        />
+                        {joinMessage ? <Text style={styles.message}>{joinMessage}</Text> : null}
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity style={styles.modalButton} onPress={handleJoinOrganization}>
+                                <Text style={styles.modalButtonText}>Join</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => {
+                                    setIsJoinModalVisible(false);
+                                    setJoinMessage('');
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Modal for Organization Details */}
             <Modal
@@ -215,6 +281,24 @@ export default function OrganizationsScreen({ navigation }) {
 
 
 const styles = StyleSheet.create({
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+        width: "90%",
+        padding: 20,
+        backgroundColor: "#272222",
+        borderRadius: 10,
+    },
+    modalTitle: {
+        fontSize: 20,
+        marginBottom: 10,
+        textAlign: "center",
+        color: "#fff",
+    },
     container: {
         flex: 1,
         padding: 20,
