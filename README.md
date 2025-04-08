@@ -1,7 +1,7 @@
 # HatchMobile Frontend
 The backend repo is available at: https://github.com/aniJani/hatchBackend.
 
-HatchMobile is a mobile application built with **React Native** and **Expo** that allows users to collaborate on projects, manage goals and tasks, and interact through chat and invitations. The app integrates with **Firebase** for authentication and communicates with a backend API for project management, invitations, and other services.
+HatchMobile is a mobile application built with **React Native** and **Expo** that allows users to find other likeminded collaborators on projects, manage goals and tasks, and interact through chat and invitations. The app integrates with **Firebase** for authentication and communicates with a backend API for project management, invitations, and other services. The application also allows responsibility allocation based on particular users' expertise. The ideal use case for this application would be in hackathons where people struggle to find collaborators according to their project, their own expertise and its match with other users' expertise.
 
 ## Table of Contents
 
