@@ -23,7 +23,7 @@ export default function SignInScreen({ navigation }) {
     try {
       const data = await signInUser(email, password); // Call the signInUser service
       Alert.alert("Success", "Sign in successful!");
-      navigation.navigate("Dashboard"); // Navigate to Dashboard on successful sign-in
+      navigation.navigate('AppTabs', { screen: 'Dashboard' }); // Navigate to Dashboard on successful sign-in
     } catch (error) {
       console.error(error);
       Alert.alert(
